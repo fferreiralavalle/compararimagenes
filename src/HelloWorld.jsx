@@ -1,11 +1,13 @@
 import React,{ Component } from 'react';
+import {Comparar} from './comparar.jsx';
 
 
 export class Principal extends Component{
-    redner(){
+    render(){
       	return(
       		<div>
             Hello word!
+            <Comparar/>
         </div>
       	);
     }
