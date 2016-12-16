@@ -18,7 +18,7 @@ body{
    width: 100%;
    box-sizing: border-box;
    font-size: 16px;
-   background-image: url("../assets/images/back1.png");
+   
    background-repeat: no-repeat;
 }
 
@@ -58,7 +58,7 @@ body{
    display: inline-block;
    background-size: cover;
    background: url(../assets/images/PokedexIzquierda.png);
-   
+
  }
  .resultado-pokedex-izquierda-datos{
 	z-index: 420;
@@ -179,7 +179,7 @@ button:focus{
    margin-left: 20%;
 }
 .favicon{
-	position: 
+	position:
 }
 
 .title{
