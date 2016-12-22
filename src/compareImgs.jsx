@@ -2,14 +2,14 @@ const imgWidth = 320;
 const imgHeight = 200;
 const divisorUmbral = 20;
 
-export const compareImgs = (event, originalImg, urls) =>{
+export const compareImgs = (event, originalImg, answersArray) =>{
   let {x,y} = getClickPosition(event);
   let imgDataArray= [];
   let clickedImag = new Image();
   return new Promise( (resolve,reject) => {
-    loadImages(originalImg,urls, imgDataArray, x, y,urls.length-1).then(
-      (clickedImage) => {
-        resolve(clickedImage);
+    loadImages(originalImg,answersArray, imgDataArray, x, y,0).then(
+      (closestElementIndex) => {
+        resolve(closestElementIndex);
       }
     );
   })
@@ -25,9 +25,9 @@ const getClickPosition = (event)=>{
 }
 
 //asynchronous
-const loadImages = (originalImg, urls, imgDataArray, x, y,index)  =>{
+const loadImages = (originalImg, answersArray, imgDataArray, x, y,index)  =>{
   return new Promise( (resolve,reject) => {
-    if (index<0){
+    if (index>=answersArray.length){
       let img = new Image();
       let context = document.createElement("canvas").getContext('2d');
       img.onload = () => {
@@ -42,13 +42,13 @@ const loadImages = (originalImg, urls, imgDataArray, x, y,index)  =>{
       img.onload = () => {
         context.drawImage(img, 0, 0);
         imgDataArray.push(context.getImageData(0,0,img.width,img.height).data);
-        loadImages(originalImg, urls,imgDataArray, x, y,index-1).then(
+        loadImages(originalImg, answersArray,imgDataArray, x, y,index+1).then(
           (resolved) => {
             resolve(resolved);
           }
         );
       };
-      img.src = urls[index];
+      img.src = answersArray[index].url;
     }
   });
 
@@ -68,7 +68,7 @@ const getClosestElement = (originalImg, imgDataArray, x, y) => {
   //get closest distance
   closestDistance = Math.min(...minDist);
 
-  //get closes element index
+  //get closest element index
   minDist.map((value,index) => {
     if (value==closestDistance) {
       closestImgIndex=index;
@@ -82,7 +82,7 @@ const getClosestElement = (originalImg, imgDataArray, x, y) => {
   }
 
   console.log("closestDistance: " + closestDistance);
-  return imgDataArray[closestImgIndex];
+  return closestImgIndex;
 
 }
 
