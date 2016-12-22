@@ -1,9 +1,11 @@
 import React,{ Component } from 'react';
 import {compareImgs} from './compareImgs.jsx';
 
+var imgWidth = 320;
+var imgHeight = 200;
 
-const imgOriginal = {'/assets/messi_original.small.jpeg'};
-const arrayImgs = [
+const originalMessi = '/assets/messi_original.small.jpeg';
+const arrayMessi = [
 {
   url: "/assets/messi_bocha.small.jpeg",
   texto: 'bocha'
@@ -17,8 +19,29 @@ const arrayImgs = [
   texto: 'fondo'
 }
 ];
+const originalJugadores = '/assets/procesada_photoshop.jpg';
+const arrayJugadores = [
+{
+  url: "/assets/messi.jpg",
+  texto: 'messi'
+},
+{
+  url: "/assets/neymar.jpg",
+  texto: 'neymar'
+},
+{
+  url: "/assets/suarez.jpg",
+  texto: 'suarez'
+},
+{
+  url: "/assets/fondo.jpg",
+  texto: 'fondo'
+}
+];
 const divisorUmbral = 20;
 
+const arrayImgs = arrayJugadores;
+const imgOriginal = originalJugadores;
 
 export class Comparar extends Component{
   constructor(props){
@@ -85,11 +108,14 @@ export class Comparar extends Component{
     }
 
     actualizarEstado(event){
-      compareImgs(event,imgOriginal,arrayImgs).then(
+      compareImgs(event,imgOriginal,arrayImgs,imgWidth,imgHeight).then(
         (resolve) => {
+          imgWidth=resolve.width;
+          imgHeight=resolve.height;
           this.setState({
-            chosenAnswerIndex : resolve
+            chosenAnswerIndex : resolve.index
         });
+
         }
       )
     }
@@ -113,7 +139,7 @@ export class Comparar extends Component{
                   actualizarEstado(event)
                 }
               }
-              width="auto" height="auto"/>
+              width={imgWidth} height={imgHeight}/>
               <h1> {h1} </h1>
               <canvas></canvas>
           </div>
