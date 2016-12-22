@@ -1,5 +1,5 @@
 import React,{ Component } from 'react';
-import {compareImgs, getDistance, getBlackDotsCoord,getPosition} from './compareImgs.jsx';
+import {compareImgs} from './compareImgs.jsx';
 
 
 const imgOriginal = '/assets/messi_original.small.jpeg';
@@ -13,32 +13,63 @@ export class Comparar extends Component{
           this.state = {
           	 "imageDataClicked":[]
           };
+          this.actualizarEstado = this.actualizarEstado.bind(this);
+          this.loadImage = this.loadImage.bind(this);
+          this.updateCanvas = this.updateCanvas.bind(this);
+        }
 
+    componentDidMount(){
+      let {loadImage} = this;
+      let imgOriginalUrlArray = [];
+      let context = [];
+      let arrayContext = [];
 
+      imgOriginalUrlArray.push(imgOriginal);
+      context.push(document.getElementById("canvasPrincipal"));
+      arrayContext.push(context[0].getContext('2d'));
 
+      loadImage (imgOriginalUrlArray, arrayContext);
+    }
 
+    componentDidUpdate(){
+      this.updateCanvas();
+    }
 
-  componentDidMount(){
+    updateCanvas = () => {
+      let canvasPrincipal = document.getElementById("canvasPrincipal");
+      let contexto = canvasPrincipal.getContext('2d');
+      let newImageData = contexto.createImageData(320,200);
+      let {imageDataClicked} = this.state;
+      imageDataClicked.map((value,index)=>{
+        newImageData.data[index]=value;
+      })
+      contexto.putImageData(newImageData,0,0);
+    }
 
-  }
+    loadImage = (arrayImgs,contextos) => {
+      arrayImgs.map( (url, index) => {
+          let img = new Image();
+          img.onload = () => {
+            contextos[index].drawImage(img, 0, 0);
+          };
+          img.src = url;
+      });
+    }
 
-  loadImage = () => {
-
-  }
-  ImgClicked(){
-
-  }
-
-  actualizarEstado(event){
-      this.setState({
-        imageDataClicked = compareImgs(event,imgOriginal,arrayImgs);
-    });
-  }
+    actualizarEstado(event){
+      compareImgs(event,imgOriginal,arrayImgs).then(
+        (resolve) => {
+          this.setState({
+            imageDataClicked : resolve
+        });
+        }
+      )
+    }
 
     render(){
+        let {actualizarEstado} = this;
       	return(
       		<div>
-            Las imagenes a comparar son:<br/>
             <canvas
               id="canvasPrincipal"
               onMouseDown={
@@ -47,37 +78,6 @@ export class Comparar extends Component{
                 }
               }
               width="auto" height="auto"/>
-            <canvas id="canvasPelota" />
-            <canvas id="calculatedGraph" />
-            <img>{ImgClicked()}</img>
-            <script>
-
-              {
-                window.onload = function() {
-
-                  window.loadImage=function(url,contexto,callback){
-                    let img = new Image();
-                    img.onload = function(){
-                      contexto.drawImage(img, 0, 0);
-                      callback(contexto.getImageData(0,0,img.width,img.height).data);
-                    };
-                    img.src = url;
-                  }
-
-                  var c = document.getElementById("canvasPrincipal");
-                  var ctx = c.getContext("2d");
-
-                  var c2 = document.getElementById("canvasPelota");
-                  var ctx2 = c2.getContext("2d");
-                  let imgDataArray = [];
-
-                  loadImage (arrayImgs[0], ctx2, function(imgDataMod) {
-                    imgDataArray.push(imgDataMod);
-                    loadImage (imgOriginal, ctx, null);
-                  });
-                }
-              }
-            </script>
           </div>
       	);
     }

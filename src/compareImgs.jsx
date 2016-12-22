@@ -1,5 +1,3 @@
-const imgOriginal = '/assets/messi_original.small.jpeg';
-const pelota = "/assets/messi_bocha.small.jpeg";
 const imgWidth = 320;
 const imgHeight = 200;
 const divisorUmbral = 20;
@@ -7,13 +5,15 @@ const divisorUmbral = 20;
 export const compareImgs = (event, originalImg, urls) =>{
   let {x,y} = getClickPosition(event);
   let imgDataArray= [];
-  let clickedImage = new Image();
-  loadImages(originalImg,urls, imgDataArray, x, y,0).then(
-    (clickedImage) => {
-      console.log(clickedImage);
-      return clickedImage;
-    }
-  );
+  let clickedImag = new Image();
+  return new Promise( (resolve,reject) => {
+    loadImages(originalImg,urls, imgDataArray, x, y,urls.length-1).then(
+      (clickedImage) => {
+        resolve(clickedImage);
+      }
+    );
+  })
+
 }
 
 const getClickPosition = (event)=>{
@@ -27,7 +27,7 @@ const getClickPosition = (event)=>{
 //asynchronous
 const loadImages = (originalImg, urls, imgDataArray, x, y,index)  =>{
   return new Promise( (resolve,reject) => {
-    if (index>=urls.length){
+    if (index<0){
       let img = new Image();
       let context = document.createElement("canvas").getContext('2d');
       img.onload = () => {
@@ -42,7 +42,7 @@ const loadImages = (originalImg, urls, imgDataArray, x, y,index)  =>{
       img.onload = () => {
         context.drawImage(img, 0, 0);
         imgDataArray.push(context.getImageData(0,0,img.width,img.height).data);
-        loadImages(originalImg, urls,imgDataArray, x, y,index+1).then(
+        loadImages(originalImg, urls,imgDataArray, x, y,index-1).then(
           (resolved) => {
             resolve(resolved);
           }
@@ -59,7 +59,7 @@ const getClosestElement = (originalImg, imgDataArray, x, y) => {
   let closestImgIndex;
   let minDist = [];
 
-  //set distances array
+  //set array of distances
   for (let i=0; i<imgDataArray.length;i++){
     let {datadiff, max} = getDiffDotsAndMax(originalImg,imgDataArray[i]);
     minDist.push(getMinDistance(datadiff, max, x, y));
@@ -146,6 +146,5 @@ export const getContrast = (imgDataDiff,max) => { //pendiente handlear img bnw
       imgBnW.data[i*4+3]=255;
     }
   }
-
   return imgBnW;
 }
