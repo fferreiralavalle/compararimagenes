@@ -6,9 +6,9 @@ var imgHeight = 1639;
 var mouseX = 0;
 var mouseY = 0;
 
-export const compareImgs = (evt,imgO,aswArr, width, height, umb, divisorimagen) => {
-  imgWidth=width;
-  imgHeight=height;
+export const compareImgs = (evt,imgO,aswArr, umb, divisorimagen) => {
+  imgWidth=evt.target.width;
+  imgHeight=evt.target.height;
   if (typeof umb !== 'undefined'){
     divisorUmbral  = umb;
    }
@@ -130,11 +130,14 @@ const getClosestElement = (originalImg, imgDataArray, x, y) => {
 const getDiffDotsAndMax = (imgDataOriginal, imgDataMod) => {
   let datadiff = [];
   let max = 0;
-  
+
   for ( var i = 0; i < imgDataMod.length; i += 4 ) {
     if (i==0) {
       console.log("getting max difference between pixels...");
+      console.log("length mod: " + imgDataMod.length + " orig lenght: "+ imgDataOriginal.length);
     }
+
+
 
     let diffPixel = (imgDataMod[i]-imgDataOriginal[i]) * (imgDataMod[i]-imgDataOriginal[i]) +
     (imgDataMod[i + 1]-imgDataOriginal[i + 1]) * (imgDataMod[i + 1]-imgDataOriginal[i + 1]) +
@@ -150,7 +153,7 @@ const getDiffDotsAndMax = (imgDataOriginal, imgDataMod) => {
 }
 
 const getMinDistance = (imgDataDiff,max, mouseX, mouseY) =>{
-  let minDist = 99999;//error checker
+  let minDist = 999999;//error checker
 
   for ( var i = 0; i < imgDataDiff.length; i ++ ) {
     if (max/divisorUmbral < imgDataDiff[i]){

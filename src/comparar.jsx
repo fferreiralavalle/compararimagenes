@@ -107,7 +107,7 @@ export class Comparar extends Component{
       console.log(event.target);
       let component = event.target;
       let {width,height} = component;
-      compareImgs(event,imgOriginal,arrayImgs,width,height).then(
+      compareImgs(event,imgOriginal,arrayImgs).then(
         (resolve) => {
           component.width=resolve.width;
           component.height=resolve.height;
