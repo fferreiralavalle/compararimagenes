@@ -1,9 +1,6 @@
 import React,{ Component } from 'react';
 import {compareImgs} from './compareImgs.jsx';
 
-var imgWidth = 320;
-var imgHeight = 200;
-
 const originalMessi = '/assets/messi_original.small.jpeg';
 const arrayMessi = [
 {
@@ -60,11 +57,8 @@ export class Comparar extends Component{
       let context = [];
       let arrayContext = [];
 
-      imgOriginalUrlArray.push(imgOriginal);
-      context.push(document.getElementById("canvasPrincipal"));
-      arrayContext.push(context[0].getContext('2d'));
-
-      loadImage (imgOriginalUrlArray, arrayContext);
+      let canvas = document.getElementById("canvasPrincipal");
+      loadImage (imgOriginal, canvas);
     }
 
     componentDidUpdate(){
@@ -97,21 +91,26 @@ export class Comparar extends Component{
 
     }
 
-    loadImage = (arrayImgs,contextos) => {
-      arrayImgs.map( (url, index) => {
-          let img = new Image();
-          img.onload = () => {
-            contextos[index].drawImage(img, 0, 0);
-          };
-          img.src = url;
-      });
+    loadImage = (url,canvas) => {
+        let img = new Image();
+        img.onload = () => {
+          let context = canvas.getContext('2d');
+          canvas.width=img.width;
+          canvas.height=img.height;
+          context.drawImage(img, 0, 0);
+        };
+        img.src = url;
+
     }
 
     actualizarEstado(event){
-      compareImgs(event,imgOriginal,arrayImgs,imgWidth,imgHeight).then(
+      console.log(event.target);
+      let component = event.target;
+      let {width,height} = component;
+      compareImgs(event,imgOriginal,arrayImgs,width,height).then(
         (resolve) => {
-          imgWidth=resolve.width;
-          imgHeight=resolve.height;
+          component.width=resolve.width;
+          component.height=resolve.height;
           this.setState({
             chosenAnswerIndex : resolve.index
         });
@@ -139,9 +138,8 @@ export class Comparar extends Component{
                   actualizarEstado(event)
                 }
               }
-              width={imgWidth} height={imgHeight}/>
-              <h1> {h1} </h1>
-              <canvas></canvas>
+            />
+            <h1> {h1} </h1>
           </div>
       	);
     }
