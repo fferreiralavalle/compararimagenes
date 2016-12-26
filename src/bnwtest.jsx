@@ -31,8 +31,11 @@ const loadBnWImages = (originalImg, answersArray, imgDataArray, index)  =>{
   return new Promise( (resolve,reject) => {
     if (index>=answersArray.length){ // si es el ultimo
       let img = new Image();
-      let context = document.createElement("canvas").getContext('2d');
+      let canvas = document.createElement("canvas");
+      let context = canvas.getContext('2d');
       img.onload = () => {
+        canvas.width = imgWidth;
+        canvas.height = imgHeight;
         context.drawImage(img, 0, 0);
         let originalImgData = context.getImageData(0,0,img.width,img.height).data;
         resolve(getBnWDataArray(originalImgData, imgDataArray));
@@ -40,8 +43,11 @@ const loadBnWImages = (originalImg, answersArray, imgDataArray, index)  =>{
       img.src = originalImg;
     }else{ //si no es el ultimo
       let img = new Image();
-      let context = document.createElement("canvas").getContext('2d');
+      let canvas = document.createElement("canvas");
+      let context = canvas.getContext('2d');
       img.onload = () => {
+        canvas.width = imgWidth;
+        canvas.height = imgHeight;
         context.drawImage(img, 0, 0);
         imgDataArray.push({
             dataArray: context.getImageData(0,0,img.width,img.height).data,
@@ -75,8 +81,6 @@ const getBnWDataArray = (dataArrayOriginal, imgDataArray) => {
 const getDiffDotsAndMax = (imgDataOriginal, imgDataMod) => {
   let datadiff = [];
   let max = 0;
-  console.log("mod");
-  console.log(imgDataOriginal.length);
 
   for ( var i = 0; i < imgDataMod.length; i += 4 ) {
     let diffPixel = (imgDataMod[i]-imgDataOriginal[i]) * (imgDataMod[i]-imgDataOriginal[i]) +
