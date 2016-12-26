@@ -1,5 +1,5 @@
 import React,{ Component } from 'react';
-import {compareImgs} from './compareImgs.jsx';
+import {compareImgs,getAllBnWCanvas,getImgOriginalSize} from './compareImgs.jsx';
 
 const originalMessi = '/assets/messi_original.small.jpeg';
 const arrayMessi = [
@@ -35,10 +35,30 @@ const arrayJugadores = [
   texto: 'fondo'
 }
 ];
+const originalCubo = '/assets/1.jpg';
+const arrayCubos = [
+{
+  url: "/assets/2.jpg",
+  texto: 'messi'
+},
+{
+  url: "/assets/3.jpg",
+  texto: 'neymar'
+},
+{
+  url: "/assets/4.jpg",
+  texto: 'suarez'
+},
+{
+  url: "/assets/5.jpg",
+  texto: 'fondo'
+}];
 const divisorUmbral = 20;
 
-const arrayImgs = arrayJugadores;
 const imgOriginal = originalJugadores;
+const arrayImgs = arrayJugadores;
+
+
 
 export class Comparar extends Component{
   constructor(props){
@@ -65,16 +85,7 @@ export class Comparar extends Component{
       this.updateCanvas();
     }
 
-    updateCanvasBnW = () => {
-      let canvasPrincipal = document.getElementById("canvasPrincipal");
-      let contexto = canvasPrincipal.getContext('2d');
-      let newImageData = contexto.createImageData(320,200);
-      let {chosenAnswerIndex} = this.state;
-      chosenAnswerIndex.map((value,index)=>{
-        newImageData.data[index]=value;
-      })
-      contexto.putImageData(newImageData,0,0);
-    }
+
 
     updateCanvas = () => {
       let canvasPrincipal = document.getElementById("canvasPrincipal");
@@ -104,10 +115,9 @@ export class Comparar extends Component{
     }
 
     actualizarEstado(event){
-      console.log(event.target);
+      //console.log(event.target);
       let component = event.target;
-      let {width,height} = component;
-      compareImgs(event,imgOriginal,arrayImgs).then(
+      compareImgs(event,imgOriginal,arrayImgs, divisorUmbral, 1).then(
         (resolve) => {
           component.width=resolve.width;
           component.height=resolve.height;
@@ -123,6 +133,7 @@ export class Comparar extends Component{
         let {actualizarEstado} = this;
         let {chosenAnswerIndex} = this.state;
         let h1;
+
         if (chosenAnswerIndex==-1){
           h1 = 'Elija una opcion';
         }
@@ -139,8 +150,45 @@ export class Comparar extends Component{
                 }
               }
             />
+            {
+              this.drawEmptyCanvas()
+            }
+            {
+              this.drawCanvas()
+            }
+
             <h1> {h1} </h1>
           </div>
       	);
+    }
+
+    drawEmptyCanvas(){
+      if (arrayImgs.length>0){
+        return (
+          arrayImgs.map((component,index)=>{
+          return (
+            <canvas width="0" height="0" key={index} id={'c'+index}/>
+          );
+        })
+      );
+      }
+      return (
+        <div/>
+      )
+    }
+    drawCanvas(){
+      let mostramelo = getAllBnWCanvas();
+      //console.log("Mostramelo length:"+mostramelo.length);
+      if (mostramelo.length>0){
+          mostramelo.map((imgBnW,index)=>{
+            let canvas = document.getElementById('c'+index);
+            let {imgWidth,imgHeight} = getImgOriginalSize();
+            canvas.width = imgWidth;
+            canvas.height = imgHeight;
+            canvas.getContext('2d').putImageData(imgBnW,0,0);
+            //console.log(imgBnW);
+
+        });
+      }
     }
 }
