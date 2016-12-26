@@ -75,6 +75,8 @@ const getBnWDataArray = (dataArrayOriginal, imgDataArray) => {
 const getDiffDotsAndMax = (imgDataOriginal, imgDataMod) => {
   let datadiff = [];
   let max = 0;
+  console.log("mod");
+  console.log(imgDataOriginal.length);
 
   for ( var i = 0; i < imgDataMod.length; i += 4 ) {
     let diffPixel = (imgDataMod[i]-imgDataOriginal[i]) * (imgDataMod[i]-imgDataOriginal[i]) +

@@ -55,10 +55,15 @@ const arrayCubos = [
 }];
 const divisorUmbral = 20;
 
+<<<<<<< HEAD
 const imgOriginal = originalJugadores;
 const arrayImgs = arrayJugadores;
 
 
+=======
+const arrayImgs = arrayMessi;
+const imgOriginal = originalMessi;
+>>>>>>> ce71aabfbfdba039db008824bb127a161822bfd9
 
 export class Comparar extends Component{
   constructor(props){

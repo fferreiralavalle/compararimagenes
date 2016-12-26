@@ -35,7 +35,6 @@ const arrayJugadores = [
   texto: 'fondo'
 }
 ];
-const divisorUmbral = 20;
 
 const arrayImgs = arrayJugadores;
 const imgOriginal = originalJugadores;
@@ -92,6 +91,8 @@ export class CompararBnw extends Component{
     arrayImgs.map( (value,index) => {
       let canvas = document.getElementById(index);
       let contexto = canvas.getContext('2d');
+      contexto.canvas.width=bnwImages.width;
+      contexto.canvas.height=bnwImages.height;
       let newImageData = contexto.createImageData(bnwImages.width,bnwImages.height);
       let x = 0;
       bnwImages.dataArray[index].map((value,index)=>{
@@ -106,10 +107,11 @@ export class CompararBnw extends Component{
     	return(
     		<div>
           <button onClick = {()=>{actualizarEstado()}}>Get Img BnW</button>
+          <br/>
           {
             arrayImgs.map( (value, index) => {
               return (
-                <canvas id={index} key={index}></canvas>
+                <canvas id={index} key={index} width='2440' height='1639'></canvas>
               );
             })
           }
