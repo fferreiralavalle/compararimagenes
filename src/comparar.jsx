@@ -37,8 +37,8 @@ const arrayJugadores = [
 ];
 const divisorUmbral = 20;
 
-const arrayImgs = arrayJugadores;
-const imgOriginal = originalJugadores;
+const arrayImgs = arrayMessi;
+const imgOriginal = originalMessi;
 
 export class Comparar extends Component{
   constructor(props){
