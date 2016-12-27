@@ -2,16 +2,40 @@ import React,{ Component } from 'react';
 
 var divisorUmbral = 20;
 var divisorimg = 1;
-var imgWidth = 2440;
-var imgHeight = 1639;
+var imgWidth;
+var imgHeight;
 var mouseX = 0;
 var mouseY = 0;
 
 
 var BnWCanvas = [];
 
+export const getImgOriginalSize = () =>{
+  return {imgWidth,imgHeight};
+}
+
+export const getAllBnWCanvas = () =>{
+
+  if (BnWCanvas.length>0){
+    return (
+      BnWCanvas
+    );
+  }
+  else{
+    return [];
+  }
+}
+
+// getBnW --Heber--
+export const getBnWImages = (originalImg, answersArray, umbral) => {
+  if(umbral !== undefined){
+    divisorUmbral = umbral;
+  }
+  return initCompareBnW(originalImg,answersArray);
+}
+
 export const compareImgs = (evt,imgO,aswArr, umb, divisorimagen) => {
-  BnWCanvas = [];
+
   imgWidth=evt.target.width;
   imgHeight=evt.target.height;
   if (typeof umb !== undefined){
@@ -111,10 +135,9 @@ const getClosestElement = (originalImg, imgDataArray) => {
     let {datadiff, max} = getDiffDotsAndMax(dataArrayOriginal,dataArrayAnswers);
     let resultado = getMinDistance(datadiff, max);
 
-    let {minDist,imgBnW} = resultado;
+    let {minDist} = resultado;
 
     minDists.push(minDist);
-    BnWCanvas.push(imgBnW);
   }
 
   //get closest distance
@@ -142,7 +165,6 @@ const getDiffDotsAndMax = (imgDataOriginal, imgDataMod) => {
   let max = 0;
   let i=0;
   for (i = 0; i < imgDataMod.length; i += 4 ) {
-
     let diffPixel =
     (imgDataMod[i]-imgDataOriginal[i]) * (imgDataMod[i]-imgDataOriginal[i]) +
     (imgDataMod[i + 1]-imgDataOriginal[i + 1]) * (imgDataMod[i + 1]-imgDataOriginal[i + 1]) +
@@ -159,42 +181,21 @@ const getDiffDotsAndMax = (imgDataOriginal, imgDataMod) => {
 const getMinDistance = (imgDataDiff,max) =>{
   let minDist = -1;//error checker
 
-  let calculatedGraph = document.createElement("canvas");
-
-  calculatedGraph.width=imgWidth;
-  calculatedGraph.height=imgHeight;
-  let contextGraph = calculatedGraph.getContext('2d');
-  let imgBnW = contextGraph.createImageData(imgWidth,imgHeight);
-
   for (let i = 0; i < imgDataDiff.length; i ++ ) {
     if (max/divisorUmbral < imgDataDiff[i]){
       let dist = getDistance(getPixelPosition(i));
-
-      imgBnW.data[i*4] = 0;
-      imgBnW.data[i*4+1] = 0;
-      imgBnW.data[i*4+2] = 0;
-      imgBnW.data[i*4+3] = 255;
-
       if (minDist==-1) {
         minDist = dist;
       }else{
         minDist = Math.min(minDist, dist);
       }
-
-    }else{
-      imgBnW.data[i*4] = 255;
-      imgBnW.data[i*4+1] = 255;
-      imgBnW.data[i*4+2] = 255;
-      imgBnW.data[i*4+3] = 255;
     }
   }
-
   if (minDist==-1) {
     console.log("Error getting min distance of image");
   }
   return {
       minDist: minDist,
-      imgBnW: imgBnW
     };
 }
 
@@ -211,38 +212,15 @@ const getPixelPosition = (indice) => {
   return {x,y};
 
 }
-export const getImgOriginalSize = () =>{
-  return {imgWidth,imgHeight};
-}
-
-export const getAllBnWCanvas = () =>{
-
-  if (BnWCanvas.length>0){
-    return (
-      BnWCanvas
-    );
-  }
-  else{
-    return [];
-  }
-}
-
-// getBnW --Heber--
-export const getBnWImages = (originalImg, answersArray, umbral) => {
-  if(umbral !== undefined){
-    divisorUmbral = umbral;
-  }
-  return initCompareBnW(originalImg,answersArray);
-}
 
 const initCompareBnW = (originalImg, answersArray) =>{
   let imgDataArray= [];
   return new Promise( (resolve,reject) => {
     loadImages(originalImg,answersArray,imgDataArray, 0).then(
       (object) => {
-        bnwDataArray = getBnWDataArray(object.originalImg1.dataArray,object.imgDataArray)
+        setBnWDataArray(object.originalImg1.dataArray,object.imgDataArray)
         resolve({
-          dataArray: bnwDataArray,
+          bnwImageDataArray: BnWCanvas,
           width: imgWidth,
           height: imgHeight
         });
@@ -251,10 +229,9 @@ const initCompareBnW = (originalImg, answersArray) =>{
   })
 }
 
-const getBnWData = (imgDataDiff,max) =>{
+const setBnWData = (imgDataDiff,max) =>{ //similar to getMinDistance
   let context = document.createElement("canvas").getContext('2d');
   let imgBnW = context.createImageData(imgWidth,imgHeight);
-  let x = 0;
   for ( var i = 0; i < imgDataDiff.length; i ++ ) {
     if (max/divisorUmbral < imgDataDiff[i]){
       imgBnW.data[i*4]=0;
@@ -266,9 +243,9 @@ const getBnWData = (imgDataDiff,max) =>{
       imgBnW.data[i*4]=255;
       imgBnW.data[i*4+1]=255
       imgBnW.data[i*4+2]=255;
-      imgBnW.data[i*4+3]=0;
+      imgBnW.data[i*4+3]=255;
     }
   }
   console.log(imgBnW);
-  return imgBnW.data;
+  BnWCanvas.push(imgBnW);
 }
