@@ -219,14 +219,19 @@ const initCompareBnW = (originalImg, answersArray) =>{
     loadImages(originalImg,answersArray,imgDataArray, 0).then(
       (object) => {
         setBnWDataArray(object.originalImg1.dataArray,object.imgDataArray)
-        resolve({
-          bnwImageDataArray: BnWCanvas,
-          width: imgWidth,
-          height: imgHeight
-        });
+        resolve(BnWCanvas);
       }
     );
   })
+}
+
+const setBnWDataArray = (dataArrayOriginal, imgDataArray) => {
+
+  for (let i=0; i<imgDataArray.length;i++){
+    let dataArrayAnswers = imgDataArray[i].dataArray;
+    let {datadiff, max} = getDiffDotsAndMax(dataArrayOriginal,dataArrayAnswers);
+    setBnWData(datadiff, max);
+  }
 }
 
 const setBnWData = (imgDataDiff,max) =>{ //similar to getMinDistance

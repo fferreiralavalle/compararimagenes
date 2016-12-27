@@ -1,5 +1,5 @@
 import React,{ Component } from 'react';
-import {compareImgs,getAllBnWCanvas,getImgOriginalSize} from './compareImgs.jsx';
+import {compareImgs,getAllBnWCanvas,getImgOriginalSize,getBnWImages} from './compareImgs.jsx';
 
 const originalMessi = '/assets/messi_original.small.jpeg';
 const arrayMessi = [
@@ -55,8 +55,8 @@ const arrayCubos = [
 }];
 const divisorUmbral = 20;
 
-const arrayImgs = arrayMessi;
-const imgOriginal = originalMessi;
+const imgOriginal = originalJugadores;
+const arrayImgs = arrayJugadores;
 
 export class Comparar extends Component{
   constructor(props){
@@ -67,6 +67,7 @@ export class Comparar extends Component{
           this.actualizarEstado = this.actualizarEstado.bind(this);
           this.loadImage = this.loadImage.bind(this);
           this.updateCanvas = this.updateCanvas.bind(this);
+          this.drawCanvas = this.drawCanvas.bind(this);
         }
 
     componentDidMount(){
@@ -128,7 +129,7 @@ export class Comparar extends Component{
     }
 
     render(){
-        let {actualizarEstado} = this;
+        let {actualizarEstado,drawCanvas} = this;
         let {chosenAnswerIndex} = this.state;
         let h1;
 
@@ -148,12 +149,11 @@ export class Comparar extends Component{
                 }
               }
             />
+            <button onClick = {()=>{drawCanvas()}}>Get Img BnW</button>
             {
               this.drawEmptyCanvas()
             }
-            {
-              this.drawCanvas()
-            }
+
 
             <h1> {h1} </h1>
           </div>
@@ -174,19 +174,21 @@ export class Comparar extends Component{
         <div/>
       )
     }
-    drawCanvas(){
-      let showBnWImgData = getAllBnWCanvas();
-      //console.log("showBnWImgData length:"+showBnWImgData.length);
-      if (showBnWImgData.length>0){
-          showBnWImgData.map((imgBnW,index)=>{
-            let canvas = document.getElementById('c'+index);
-            let {imgWidth,imgHeight} = getImgOriginalSize();
-            canvas.width = imgWidth;
-            canvas.height = imgHeight;
-            canvas.getContext('2d').putImageData(imgBnW,0,0);
-            //console.log(imgBnW);
 
-        });
-      }
+    drawCanvas(){
+      getBnWImages(imgOriginal,arrayImgs).then(
+        (bnwImages) => {
+          console.log(bnwImages);
+          bnwImages.map( (value,index) => {
+            let canvas = document.getElementById("c"+index);
+            let contexto = canvas.getContext('2d');
+            console.log(value);
+            contexto.canvas.width=value.width;
+            contexto.canvas.height=value.height;
+            contexto.putImageData(value,0,0);
+          });
+        }
+      );
+      console.log("EWEEEEEEEEEE");
     }
 }
