@@ -4,6 +4,9 @@ var divisorUmbral = 20;
 var divisorimg = 1;
 var imgWidth = 2440;
 var imgHeight = 1639;
+var mouseX = 0;
+var mouseY = 0;
+
 
 var BnWCanvas = [];
 
@@ -17,18 +20,17 @@ export const compareImgs = (evt,imgO,aswArr, umb, divisorimagen) => {
    if (typeof divisorimagen !== undefined){
       divisorimg = divisorimagen;
     }
-    //console.log("width: "+imgWidth + " height: "+imgHeight);
     return initCompare(evt,imgO,aswArr);
 }
 
 const initCompare = (event, originalImg, answersArray) =>{
-  let {x,y} = getClickPosition(event);
-  //console.log('click en :'+x+', '+y);
+  setClickPosition(event);
   let imgDataArray= [];
 
   return new Promise( (resolve,reject) => {
-    loadImages(originalImg,answersArray, imgDataArray, x, y,0).then(
-      (closestElementIndex) => {
+    loadImages(originalImg,answersArray, imgDataArray,0).then(
+      (object) => {
+        let closestElementIndex = getClosestElement(object.originalImg1,object.imgDataArray);
         resolve({
           index: closestElementIndex,
           width: imgWidth,
@@ -40,17 +42,16 @@ const initCompare = (event, originalImg, answersArray) =>{
 
 }
 
-const getClickPosition = (event)=>{
+const setClickPosition = (event)=>{
     let canvas = document.getElementById("canvasPrincipal");
     let rect = canvas.getBoundingClientRect();
     let x = (event.clientX - rect.left);
     let y = (event.clientY - rect.top);
-    //console.log("x: "+x+" y: "+y);
-    return {x,y};
+    mouseX = x;
+    mouseY = y
 }
 
-
-const loadImages = (originalImg, answersArray, imgDataArray, x, y,index)  =>{
+const loadImages = (originalImg, answersArray, imgDataArray,index)  =>{
   return new Promise( (resolve,reject) => {
     if (index>=answersArray.length){
       let img = new Image();
@@ -65,7 +66,10 @@ const loadImages = (originalImg, answersArray, imgDataArray, x, y,index)  =>{
             width: img.width,
             height: img.height
           };
-        resolve(getClosestElement(originalImg1, imgDataArray, x, y));
+        resolve({
+          originalImg1 : originalImg1,
+          imgDataArray : imgDataArray
+        });
       }
       img.src = originalImg;
     }else{
@@ -83,7 +87,7 @@ const loadImages = (originalImg, answersArray, imgDataArray, x, y,index)  =>{
           });
         imgWidth=img.width;
         imgHeight=img.height;
-        loadImages(originalImg, answersArray,imgDataArray, x, y,index+1).then(
+        loadImages(originalImg, answersArray,imgDataArray,index+1).then(
           (resolved) => {
             resolve(resolved);
           }
@@ -95,7 +99,7 @@ const loadImages = (originalImg, answersArray, imgDataArray, x, y,index)  =>{
 
 }
 
-const getClosestElement = (originalImg, imgDataArray, x, y) => {
+const getClosestElement = (originalImg, imgDataArray) => {
   let closestDistance= -1;//error checker
   let closestImgIndex;
   let minDists = [];
@@ -105,7 +109,7 @@ const getClosestElement = (originalImg, imgDataArray, x, y) => {
   for (let i=0; i<imgDataArray.length;i++){
     let dataArrayAnswers = imgDataArray[i].dataArray;
     let {datadiff, max} = getDiffDotsAndMax(dataArrayOriginal,dataArrayAnswers);
-    let resultado = getMinDistance(datadiff, max, x, y);
+    let resultado = getMinDistance(datadiff, max);
 
     let {minDist,imgBnW} = resultado;
 
@@ -125,11 +129,10 @@ const getClosestElement = (originalImg, imgDataArray, x, y) => {
 
   //validate
   if (closestDistance<0) {
-    //console.log("Error: cannot get closest distance");
+    console.log("Error: cannot get closest distance");
     return null;
   }
 
-  //console.log("closestDistance: " + closestDistance);
   return closestImgIndex;
 
 }
@@ -139,10 +142,6 @@ const getDiffDotsAndMax = (imgDataOriginal, imgDataMod) => {
   let max = 0;
   let i=0;
   for (i = 0; i < imgDataMod.length; i += 4 ) {
-    if (i==0) {
-      //console.log("getting max difference between pixels...");
-      //console.log("length mod: " + imgDataMod.length + " orig lenght: "+ imgDataOriginal.length);
-    }
 
     let diffPixel =
     (imgDataMod[i]-imgDataOriginal[i]) * (imgDataMod[i]-imgDataOriginal[i]) +
@@ -154,57 +153,52 @@ const getDiffDotsAndMax = (imgDataOriginal, imgDataMod) => {
     max = Math.max(max,diffPixel);
 
   }
-  //console.log("max: "+max);
-  //console.log("termino diffdots con i="+i);
   return {datadiff, max};
 }
 
-const getMinDistance = (imgDataDiff,max, mouseX, mouseY) =>{
-  let minDist = 99999999;//error checker
+const getMinDistance = (imgDataDiff,max) =>{
+  let minDist = -1;//error checker
 
   let calculatedGraph = document.createElement("canvas");
 
   calculatedGraph.width=imgWidth;
   calculatedGraph.height=imgHeight;
-  //console.log("calculated graph width "+calculatedGraph.width+" height: "+calculatedGraph.height);
   let contextGraph = calculatedGraph.getContext('2d');
   let imgBnW = contextGraph.createImageData(imgWidth,imgHeight);
 
-  var i;
-  //console.log("imgdatadiff length: "+imgDataDiff.length+" divisorUmbral: "+divisorUmbral)
-  //console.log("MAX: "+max)
-  for (i = 0; i < imgDataDiff.length; i ++ ) {
+  for (let i = 0; i < imgDataDiff.length; i ++ ) {
     if (max/divisorUmbral < imgDataDiff[i]){
-      let dist = getDistance(mouseX,mouseY,getPixelPosition(i));
+      let dist = getDistance(getPixelPosition(i));
 
       imgBnW.data[i*4] = 0;
       imgBnW.data[i*4+1] = 0;
       imgBnW.data[i*4+2] = 0;
       imgBnW.data[i*4+3] = 255;
 
-      minDist = Math.min(minDist, dist);
+      if (minDist==-1) {
+        minDist = dist;
+      }else{
+        minDist = Math.min(minDist, dist);
+      }
+
     }else{
       imgBnW.data[i*4] = 255;
-      imgBnW.data[i*4+1] = 0;
-      imgBnW.data[i*4+2] = 0;
+      imgBnW.data[i*4+1] = 255;
+      imgBnW.data[i*4+2] = 255;
       imgBnW.data[i*4+3] = 255;
     }
   }
-  // contextGraph.putImageData(imgBnW,0,0);
-  //console.log("salio de for con i="+i)
-  //console.log(imgBnW);
 
-  if (minDist>=99999999) {
-    //console.log("Error getting min distance of image");
+  if (minDist==-1) {
+    console.log("Error getting min distance of image");
   }
-  //console.log("Min distance: " + minDist);
   return {
       minDist: minDist,
       imgBnW: imgBnW
     };
 }
 
-const getDistance = (mouseX,mouseY,blackDotCoord) => {
+const getDistance = (blackDotCoord) => {
   const distX = Math.pow((mouseX - blackDotCoord.x),2);
   const distY =  Math.pow((mouseY - blackDotCoord.y),2);
   return Math.sqrt((distX+distY));
@@ -231,4 +225,50 @@ export const getAllBnWCanvas = () =>{
   else{
     return [];
   }
+}
+
+// getBnW --Heber--
+export const getBnWImages = (originalImg, answersArray, umbral) => {
+  if(umbral !== undefined){
+    divisorUmbral = umbral;
+  }
+  return initCompareBnW(originalImg,answersArray);
+}
+
+const initCompareBnW = (originalImg, answersArray) =>{
+  let imgDataArray= [];
+  return new Promise( (resolve,reject) => {
+    loadImages(originalImg,answersArray,imgDataArray, 0).then(
+      (object) => {
+        bnwDataArray = getBnWDataArray(object.originalImg1.dataArray,object.imgDataArray)
+        resolve({
+          dataArray: bnwDataArray,
+          width: imgWidth,
+          height: imgHeight
+        });
+      }
+    );
+  })
+}
+
+const getBnWData = (imgDataDiff,max) =>{
+  let context = document.createElement("canvas").getContext('2d');
+  let imgBnW = context.createImageData(imgWidth,imgHeight);
+  let x = 0;
+  for ( var i = 0; i < imgDataDiff.length; i ++ ) {
+    if (max/divisorUmbral < imgDataDiff[i]){
+      imgBnW.data[i*4]=0;
+      imgBnW.data[i*4+1]=0;
+      imgBnW.data[i*4+2]=0;
+      imgBnW.data[i*4+3]=255;
+    }
+    else{
+      imgBnW.data[i*4]=255;
+      imgBnW.data[i*4+1]=255
+      imgBnW.data[i*4+2]=255;
+      imgBnW.data[i*4+3]=0;
+    }
+  }
+  console.log(imgBnW);
+  return imgBnW.data;
 }

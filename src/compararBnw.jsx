@@ -1,5 +1,5 @@
 import React,{ Component } from 'react';
-import {getBnWImages} from './bnwTest.jsx';
+import {getBnWImages} from './compareImgs.jsx';
 
 const originalMessi = '/assets/messi_original.small.jpeg';
 const arrayMessi = [

@@ -101,7 +101,6 @@ const getBnWData = (imgDataDiff,max) =>{
   let imgBnW = context.createImageData(imgWidth,imgHeight);
   let x = 0;
   for ( var i = 0; i < imgDataDiff.length; i ++ ) {
-
     if (max/divisorUmbral < imgDataDiff[i]){
       imgBnW.data[i*4]=0;
       imgBnW.data[i*4+1]=0;

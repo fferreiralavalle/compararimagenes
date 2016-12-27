@@ -175,10 +175,10 @@ export class Comparar extends Component{
       )
     }
     drawCanvas(){
-      let mostramelo = getAllBnWCanvas();
-      //console.log("Mostramelo length:"+mostramelo.length);
-      if (mostramelo.length>0){
-          mostramelo.map((imgBnW,index)=>{
+      let showBnWImgData = getAllBnWCanvas();
+      //console.log("showBnWImgData length:"+showBnWImgData.length);
+      if (showBnWImgData.length>0){
+          showBnWImgData.map((imgBnW,index)=>{
             let canvas = document.getElementById('c'+index);
             let {imgWidth,imgHeight} = getImgOriginalSize();
             canvas.width = imgWidth;
