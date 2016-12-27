@@ -1,7 +1,7 @@
 import React,{ Component } from 'react';
 
 var divisorUmbral = 20;
-var divisorimg = 1;
+var divisorimg = 10;
 var imgWidth;
 var imgHeight;
 var mouseX = 0;
@@ -71,24 +71,27 @@ const setClickPosition = (event)=>{
     let rect = canvas.getBoundingClientRect();
     let x = (event.clientX - rect.left);
     let y = (event.clientY - rect.top);
-    mouseX = x;
-    mouseY = y
+    mouseX = x/divisorimg;
+    mouseY = y/divisorimg;
 }
 
 const loadImages = (originalImg, answersArray, imgDataArray,index)  =>{
   return new Promise( (resolve,reject) => {
+    let img = new Image();
+    let canvas = document.createElement("canvas")
+    let context = canvas.getContext('2d');
     if (index>=answersArray.length){
-      let img = new Image();
-      let canvas = document.createElement("canvas")
-      let context = canvas.getContext('2d');
       img.onload = () => {
-        canvas.width=img.width;
-        canvas.height=img.height;
+        let modifiedWidth = img.width/divisorimg;
+        let modifiedHeight = img.height/divisorimg;
+        canvas.width=modifiedWidth;
+        canvas.height=modifiedHeight;
+        context.scale(1/divisorimg,1/divisorimg);
         context.drawImage(img, 0, 0);
         let originalImg1 = {
-            dataArray: context.getImageData(0,0,img.width,img.height).data,
-            width: img.width,
-            height: img.height
+            dataArray: context.getImageData(0,0,modifiedWidth,modifiedHeight).data,
+            width: modifiedWidth,
+            height: modifiedHeight
           };
         resolve({
           originalImg1 : originalImg1,
@@ -97,20 +100,20 @@ const loadImages = (originalImg, answersArray, imgDataArray,index)  =>{
       }
       img.src = originalImg;
     }else{
-      let img = new Image();
-      let canvas = document.createElement("canvas")
-      let context = canvas.getContext('2d');
       img.onload = () => {
-        canvas.width=img.width;
-        canvas.height=img.height;
+        let modifiedWidth = img.width/divisorimg;
+        let modifiedHeight = img.height/divisorimg;
+        canvas.width=modifiedWidth;
+        canvas.height=modifiedHeight;
+        context.scale(1/divisorimg,1/divisorimg);
         context.drawImage(img, 0, 0);
         imgDataArray.push({
-            dataArray: context.getImageData(0,0,img.width,img.height).data,
-            width: img.width,
-            height: img.height
+            dataArray: context.getImageData(0,0,modifiedWidth,modifiedHeight).data,
+            width: modifiedWidth,
+            height: modifiedHeight
           });
-        imgWidth=img.width;
-        imgHeight=img.height;
+        imgWidth=modifiedWidth;
+        imgHeight=modifiedHeight;
         loadImages(originalImg, answersArray,imgDataArray,index+1).then(
           (resolved) => {
             resolve(resolved);
@@ -128,7 +131,7 @@ const getClosestElement = (originalImg, imgDataArray) => {
   let closestImgIndex;
   let minDists = [];
   let dataArrayOriginal = originalImg.dataArray;
-
+  console.log("imgDataArray.length="+imgDataArray.length);
   //set array of distances
   for (let i=0; i<imgDataArray.length;i++){
     let dataArrayAnswers = imgDataArray[i].dataArray;
@@ -164,6 +167,7 @@ const getDiffDotsAndMax = (imgDataOriginal, imgDataMod) => {
   let datadiff = [];
   let max = 0;
   let i=0;
+  console.log("imgDataMod.length;="+imgDataMod.length);
   for (i = 0; i < imgDataMod.length; i += 4 ) {
     let diffPixel =
     (imgDataMod[i]-imgDataOriginal[i]) * (imgDataMod[i]-imgDataOriginal[i]) +

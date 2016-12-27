@@ -92,7 +92,9 @@ export class Comparar extends Component{
       let {chosenAnswerIndex} = this.state;
       let newImage = new Image();
       newImage.onload = () => {
+
         contexto.drawImage(newImage,0,0);
+
       }
       newImage.src = arrayImgs[chosenAnswerIndex].url;
 
@@ -107,6 +109,7 @@ export class Comparar extends Component{
           let context = canvas.getContext('2d');
           canvas.width=img.width;
           canvas.height=img.height;
+
           context.drawImage(img, 0, 0);
         };
         img.src = url;
@@ -116,10 +119,10 @@ export class Comparar extends Component{
     actualizarEstado(event){
       //console.log(event.target);
       let component = event.target;
-      compareImgs(event,imgOriginal,arrayImgs, divisorUmbral, 1,true).then(
+      compareImgs(event,imgOriginal,arrayImgs, divisorUmbral, 10,true).then(
         (resolve) => {
-          component.width=resolve.width;
-          component.height=resolve.height;
+          // component.width=resolve.width;
+          // component.height=resolve.height;
           this.setState({
             chosenAnswerIndex : resolve.index
         });
