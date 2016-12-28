@@ -84,51 +84,52 @@ export class Comparar extends Component{
       this.updateCanvas();
     }
 
-
-
     updateCanvas = () => {
+      let {loadImage} = this;
+      let {chosenAnswerIndex} = this.state;
+      let {url} = arrayImgs[chosenAnswerIndex];
       let canvasPrincipal = document.getElementById("canvasPrincipal");
       let contexto = canvasPrincipal.getContext('2d');
-      let {chosenAnswerIndex} = this.state;
-      let newImage = new Image();
-      newImage.onload = () => {
-
-        contexto.drawImage(newImage,0,0);
-
-      }
-      newImage.src = arrayImgs[chosenAnswerIndex].url;
-
-
-
-
+      loadImage(url,canvasPrincipal);
     }
 
     loadImage = (url,canvas) => {
         let img = new Image();
         img.onload = () => {
+          let {props} = this;
+
           let context = canvas.getContext('2d');
-          canvas.width=img.width;
-          canvas.height=img.height;
+          let {width,height} = img;
+
+          let desiredWidth = props.width;
+          let desiredWidthWidthRelation = desiredWidth/width;
+          let heightWidthRelation = height/width;
+          let newHeight = desiredWidth*heightWidthRelation;
+          let newHeightHeightRelation = newHeight/height;
+          canvas.width=desiredWidth;
+          canvas.height=newHeight;
+          context.scale(
+            desiredWidthWidthRelation,
+            newHeightHeightRelation
+          );
 
           context.drawImage(img, 0, 0);
         };
         img.src = url;
-
     }
 
     actualizarEstado(event){
       //console.log(event.target);
       let component = event.target;
-      compareImgs(event,imgOriginal,arrayImgs, divisorUmbral, 10,true).then(
-        (resolve) => {
-          // component.width=resolve.width;
-          // component.height=resolve.height;
+      compareImgs(event,imgOriginal,arrayImgs, divisorUmbral,10).then(
+        (resolve) =>
+        {
+          let {index} = resolve;
           this.setState({
-            chosenAnswerIndex : resolve.index
-        });
-
+            chosenAnswerIndex : index
+          });
         }
-      )
+      );
     }
 
     render(){

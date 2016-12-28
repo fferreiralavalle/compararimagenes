@@ -36,8 +36,6 @@ export const getBnWImages = (originalImg, answersArray, umbral) => {
 
 export const compareImgs = (evt,imgO,aswArr, umb, divisorimagen) => {
 
-  imgWidth=evt.target.width;
-  imgHeight=evt.target.height;
   if (typeof umb !== undefined){
     divisorUmbral  = umb;
    }
@@ -48,12 +46,12 @@ export const compareImgs = (evt,imgO,aswArr, umb, divisorimagen) => {
 }
 
 const initCompare = (event, originalImg, answersArray) =>{
-  setClickPosition(event);
   let imgDataArray= [];
-
+  event.persist();
   return new Promise( (resolve,reject) => {
     loadImages(originalImg,answersArray, imgDataArray,0).then(
       (object) => {
+        setClickPosition(event);
         let closestElementIndex = getClosestElement(object.originalImg1,object.imgDataArray);
         resolve({
           index: closestElementIndex,
@@ -67,12 +65,39 @@ const initCompare = (event, originalImg, answersArray) =>{
 }
 
 const setClickPosition = (event)=>{
-    let canvas = document.getElementById("canvasPrincipal");
+    let canvas = event.target;
     let rect = canvas.getBoundingClientRect();
+    console.log("canvas.width="+canvas.width+" canvas.height="+canvas.height);
     let x = (event.clientX - rect.left);
     let y = (event.clientY - rect.top);
-    mouseX = x/divisorimg;
-    mouseY = y/divisorimg;
+
+    let coordXY = {
+      x: x,
+      y: y
+    }, oldSize = {
+      width: canvas.width,
+      height: canvas.height
+    }, newSize = {
+      width: imgWidth,
+      height: imgHeight
+    }
+    let newCoordMouse = convertCoord(coordXY,oldSize,newSize);
+    mouseX = newCoordMouse.x;
+    mouseY = newCoordMouse.y;
+}
+
+const convertCoord = (coordXY,oldSize,newSize) =>{
+  let oldWidth = oldSize.width;
+  let oldHeight = oldSize.height;
+  let newWidth = newSize.width;
+  let newHeight = newSize.height;
+  let widthRelation = newWidth/oldWidth;
+  let heightRelation = newHeight/oldHeight;
+  return {
+    x: coordXY.x*widthRelation,
+    y: coordXY.y*heightRelation
+  }
+
 }
 
 const loadImages = (originalImg, answersArray, imgDataArray,index)  =>{
@@ -93,6 +118,9 @@ const loadImages = (originalImg, answersArray, imgDataArray,index)  =>{
             width: modifiedWidth,
             height: modifiedHeight
           };
+        imgWidth=modifiedWidth;
+        imgHeight=modifiedHeight;
+
         resolve({
           originalImg1 : originalImg1,
           imgDataArray : imgDataArray
@@ -112,8 +140,6 @@ const loadImages = (originalImg, answersArray, imgDataArray,index)  =>{
             width: modifiedWidth,
             height: modifiedHeight
           });
-        imgWidth=modifiedWidth;
-        imgHeight=modifiedHeight;
         loadImages(originalImg, answersArray,imgDataArray,index+1).then(
           (resolved) => {
             resolve(resolved);

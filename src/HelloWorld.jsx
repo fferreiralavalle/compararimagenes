@@ -8,7 +8,7 @@ export class Principal extends Component{
       	return(
       		<div>
             Hello word!
-            <Comparar/>
+            <Comparar width="500"/>
 
           </div>
       	);
