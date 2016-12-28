@@ -1,7 +1,7 @@
 import React,{ Component } from 'react';
 
 var divisorUmbral = 20;
-var divisorimg = 10;
+var divisorimg = 15;
 var imgWidth;
 var imgHeight;
 var mouseX = 0;
@@ -27,11 +27,14 @@ export const getAllBnWCanvas = () =>{
 }
 
 // getBnW --Heber--
-export const getBnWImages = (originalImg, answersArray, umbral) => {
+export const getBnWImages = (originalImg, answersArray, umbral,compression) => {
   if(umbral !== undefined){
     divisorUmbral = umbral;
   }
-  return initCompareBnW(originalImg,answersArray);
+  if (compression !== undefined){
+    divisorUmbral=compression;
+  }
+  return initCompareBnW(originalImg,answersArray,umbral,compression);
 }
 
 export const compareImgs = (evt,imgO,aswArr, umb, divisorimagen) => {
@@ -67,10 +70,10 @@ const initCompare = (event, originalImg, answersArray) =>{
 const setClickPosition = (event)=>{
     let canvas = event.target;
     let rect = canvas.getBoundingClientRect();
-    console.log("canvas.width="+canvas.width+" canvas.height="+canvas.height);
-    let x = (event.clientX - rect.left);
-    let y = (event.clientY - rect.top);
 
+    let x = Math.floor(event.clientX - rect.left);
+    let y = Math.floor(event.clientY - rect.top);
+    console.log(x,y);
     let coordXY = {
       x: x,
       y: y
@@ -82,8 +85,11 @@ const setClickPosition = (event)=>{
       height: imgHeight
     }
     let newCoordMouse = convertCoord(coordXY,oldSize,newSize);
-    mouseX = newCoordMouse.x;
-    mouseY = newCoordMouse.y;
+
+    mouseX =  Math.floor(newCoordMouse.x);
+    mouseY =  Math.floor(newCoordMouse.y);
+    console.log(oldSize,newSize);
+    console.log(mouseX,mouseY);
 }
 
 const convertCoord = (coordXY,oldSize,newSize) =>{
@@ -157,7 +163,7 @@ const getClosestElement = (originalImg, imgDataArray) => {
   let closestImgIndex;
   let minDists = [];
   let dataArrayOriginal = originalImg.dataArray;
-  console.log("imgDataArray.length="+imgDataArray.length);
+
   //set array of distances
   for (let i=0; i<imgDataArray.length;i++){
     let dataArrayAnswers = imgDataArray[i].dataArray;
@@ -181,7 +187,7 @@ const getClosestElement = (originalImg, imgDataArray) => {
 
   //validate
   if (closestDistance<0) {
-    console.log("Error: cannot get closest distance");
+
     return null;
   }
 
@@ -193,7 +199,7 @@ const getDiffDotsAndMax = (imgDataOriginal, imgDataMod) => {
   let datadiff = [];
   let max = 0;
   let i=0;
-  console.log("imgDataMod.length;="+imgDataMod.length);
+
   for (i = 0; i < imgDataMod.length; i += 4 ) {
     let diffPixel =
     (imgDataMod[i]-imgDataOriginal[i]) * (imgDataMod[i]-imgDataOriginal[i]) +
@@ -243,8 +249,10 @@ const getPixelPosition = (indice) => {
 
 }
 
-const initCompareBnW = (originalImg, answersArray) =>{
+const initCompareBnW = (originalImg, answersArray,umbral,divisor) =>{
   let imgDataArray= [];
+  divisorUmbral=umbral;
+  divisorimg=divisor;
   return new Promise( (resolve,reject) => {
     loadImages(originalImg,answersArray,imgDataArray, 0).then(
       (object) => {
@@ -281,6 +289,5 @@ const setBnWData = (imgDataDiff,max) =>{ //similar to getMinDistance
       imgBnW.data[i*4+3]=255;
     }
   }
-  console.log(imgBnW);
   BnWCanvas.push(imgBnW);
 }

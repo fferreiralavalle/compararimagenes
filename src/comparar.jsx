@@ -1,63 +1,6 @@
 import React,{ Component } from 'react';
 import {compareImgs,getAllBnWCanvas,getImgOriginalSize,getBnWImages} from './compareImgs.jsx';
 
-const originalMessi = '/assets/messi_original.small.jpeg';
-const arrayMessi = [
-{
-  url: "/assets/messi_bocha.small.jpeg",
-  texto: 'bocha'
-},
-{
-  url: "assets/messi_cuerpo.small.jpeg",
-  texto: 'messi'
-},
-{
-  url: "assets/messi_fondo.small.jpeg",
-  texto: 'fondo'
-}
-];
-const originalJugadores = '/assets/procesada_photoshop.jpg';
-const arrayJugadores = [
-{
-  url: "/assets/messi.jpg",
-  texto: 'messi'
-},
-{
-  url: "/assets/neymar.jpg",
-  texto: 'neymar'
-},
-{
-  url: "/assets/suarez.jpg",
-  texto: 'suarez'
-},
-{
-  url: "/assets/fondo.jpg",
-  texto: 'fondo'
-}
-];
-const originalCubo = '/assets/1.jpg';
-const arrayCubos = [
-{
-  url: "/assets/2.jpg",
-  texto: 'messi'
-},
-{
-  url: "/assets/3.jpg",
-  texto: 'neymar'
-},
-{
-  url: "/assets/4.jpg",
-  texto: 'suarez'
-},
-{
-  url: "/assets/5.jpg",
-  texto: 'fondo'
-}];
-const divisorUmbral = 20;
-
-const imgOriginal = originalJugadores;
-const arrayImgs = arrayJugadores;
-
 export class Comparar extends Component{
   constructor(props){
           super(props);
@@ -72,12 +15,13 @@ export class Comparar extends Component{
 
     componentDidMount(){
       let {loadImage} = this;
+      let {original} = this.props;
       let imgOriginalUrlArray = [];
       let context = [];
       let arrayContext = [];
 
       let canvas = document.getElementById("canvasPrincipal");
-      loadImage (imgOriginal, canvas);
+      loadImage (original, canvas);
     }
 
     componentDidUpdate(){
@@ -87,41 +31,68 @@ export class Comparar extends Component{
     updateCanvas = () => {
       let {loadImage} = this;
       let {chosenAnswerIndex} = this.state;
-      let {url} = arrayImgs[chosenAnswerIndex];
+      let {answers} = this.props;
+      let {url} = answers[chosenAnswerIndex];
       let canvasPrincipal = document.getElementById("canvasPrincipal");
       let contexto = canvasPrincipal.getContext('2d');
       loadImage(url,canvasPrincipal);
+
     }
 
     loadImage = (url,canvas) => {
-        let img = new Image();
-        img.onload = () => {
-          let {props} = this;
+       let img = new Image();
+       img.onload = () => {
+         let {props} = this;
+         let context = canvas.getContext('2d');
+         let {width,height} = img;
 
-          let context = canvas.getContext('2d');
-          let {width,height} = img;
+         let desiredWidth = props.width;
+         let desiredWidthWidthRelation = desiredWidth/width;
+         let heightWidthRelation = height/width;
+         let newHeight = desiredWidth*heightWidthRelation;
+         let newHeightHeightRelation = newHeight/height;
+         canvas.width=desiredWidth;
+         canvas.height=newHeight;
+         context.scale(
+           desiredWidthWidthRelation,
+           newHeightHeightRelation
+         );
 
-          let desiredWidth = props.width;
-          let desiredWidthWidthRelation = desiredWidth/width;
-          let heightWidthRelation = height/width;
-          let newHeight = desiredWidth*heightWidthRelation;
-          let newHeightHeightRelation = newHeight/height;
-          canvas.width=desiredWidth;
-          canvas.height=newHeight;
-          context.scale(
-            desiredWidthWidthRelation,
-            newHeightHeightRelation
-          );
+         context.drawImage(img, 0, 0);
+       };
+       img.src = url;
+   }
 
-          context.drawImage(img, 0, 0);
-        };
-        img.src = url;
-    }
+    // resize = (canvas) =>{
+    //   let {width,height} = canvas;
+    //   let context = canvas.getContext('2d');
+    //   let {size} = this.props;
+    //
+    //   if (width>=height){
+    //
+    //   }else{
+    //     let desiredHeight = size;
+    //     let desiredHeightHeightRelation = desiredHeight/height;
+    //
+    //     let heightWidthRelation = height/width;
+    //
+    //     let newWidth = desiredHeight/heightWidthRelation;
+    //     let newWidthWidthRelation = newWidth/width;
+    //
+    //     canvas.width=newWidth;
+    //     canvas.height=desiredHeight;
+    //     context.scale(
+    //       newWidthWidthRelation,
+    //       desiredHeightWidthRelation
+    //     );
+    //   }
+    // }
 
     actualizarEstado(event){
-      //console.log(event.target);
+
       let component = event.target;
-      compareImgs(event,imgOriginal,arrayImgs, divisorUmbral,10).then(
+      let {original,answers,umbral,compression} = this.props;
+      compareImgs(event,original,answers, umbral,compression).then(
         (resolve) =>
         {
           let {index} = resolve;
@@ -135,13 +106,14 @@ export class Comparar extends Component{
     render(){
         let {actualizarEstado,drawCanvas} = this;
         let {chosenAnswerIndex} = this.state;
+        let {answers} = this.props;
         let h1;
 
         if (chosenAnswerIndex==-1){
           h1 = 'Elija una opcion';
         }
         else{
-          h1 = 'usted ha elegido: '+ arrayImgs[chosenAnswerIndex].texto
+          h1 = 'usted ha elegido: '+ answers[chosenAnswerIndex].texto
         }
       	return(
       		<div>
@@ -165,11 +137,16 @@ export class Comparar extends Component{
     }
 
     drawEmptyCanvas(){
-      if (arrayImgs.length>0){
+      let {answers} = this.props;
+      if (answers.length>0){
         return (
-          arrayImgs.map((component,index)=>{
+          answers.map((component,index)=>{
           return (
-            <canvas width="0" height="0" key={index} id={'c'+index}/>
+            <div key={index}>
+              <br/>
+              <canvas width="0" height="0" key={index} id={'c'+index}/>
+            </div>
+
           );
         })
       );
@@ -180,19 +157,20 @@ export class Comparar extends Component{
     }
 
     drawCanvas(){
-      getBnWImages(imgOriginal,arrayImgs).then(
+      let {original,answers,umbral,compression} = this.props;
+      console.log(compression);
+      getBnWImages(original,answers,umbral,compression).then(
         (bnwImages) => {
-          console.log(bnwImages);
+
           bnwImages.map( (value,index) => {
             let canvas = document.getElementById("c"+index);
             let contexto = canvas.getContext('2d');
-            console.log(value);
+
             contexto.canvas.width=value.width;
             contexto.canvas.height=value.height;
             contexto.putImageData(value,0,0);
           });
         }
       );
-      console.log("EWEEEEEEEEEE");
     }
 }
