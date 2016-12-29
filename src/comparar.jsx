@@ -1,5 +1,5 @@
 import React,{ Component } from 'react';
-import {compareImgs,getAllBnWCanvas,getImgOriginalSize,getBnWImages} from './compareImgs.jsx';
+import {compareImgs,getBnWImages} from './compareImgs.jsx';
 
 export class Comparar extends Component{
   constructor(props){
@@ -16,10 +16,6 @@ export class Comparar extends Component{
     componentDidMount(){
       let {loadImage} = this;
       let {original} = this.props;
-      let imgOriginalUrlArray = [];
-      let context = [];
-      let arrayContext = [];
-
       let canvas = document.getElementById("canvasPrincipal");
       loadImage (original, canvas);
     }
@@ -34,10 +30,9 @@ export class Comparar extends Component{
       let {answers} = this.props;
       let {url} = answers[chosenAnswerIndex];
       let canvasPrincipal = document.getElementById("canvasPrincipal");
-      let contexto = canvasPrincipal.getContext('2d');
       loadImage(url,canvasPrincipal);
 
-    }
+    };
 
     loadImage = (url,canvas) => {
        let img = new Image();
@@ -57,40 +52,12 @@ export class Comparar extends Component{
            desiredWidthWidthRelation,
            newHeightHeightRelation
          );
-
          context.drawImage(img, 0, 0);
        };
        img.src = url;
-   }
-
-    // resize = (canvas) =>{
-    //   let {width,height} = canvas;
-    //   let context = canvas.getContext('2d');
-    //   let {size} = this.props;
-    //
-    //   if (width>=height){
-    //
-    //   }else{
-    //     let desiredHeight = size;
-    //     let desiredHeightHeightRelation = desiredHeight/height;
-    //
-    //     let heightWidthRelation = height/width;
-    //
-    //     let newWidth = desiredHeight/heightWidthRelation;
-    //     let newWidthWidthRelation = newWidth/width;
-    //
-    //     canvas.width=newWidth;
-    //     canvas.height=desiredHeight;
-    //     context.scale(
-    //       newWidthWidthRelation,
-    //       desiredHeightWidthRelation
-    //     );
-    //   }
-    // }
+   };
 
     actualizarEstado(event){
-
-      let component = event.target;
       let {original,answers,umbral,compression} = this.props;
       compareImgs(event,original,answers, umbral,compression).then(
         (resolve) =>
@@ -129,8 +96,6 @@ export class Comparar extends Component{
             {
               this.drawEmptyCanvas()
             }
-
-
             <h1> {h1} </h1>
           </div>
       	);
@@ -154,18 +119,16 @@ export class Comparar extends Component{
       return (
         <div/>
       )
-    }
+    };
 
     drawCanvas(){
       let {original,answers,umbral,compression} = this.props;
       console.log(compression);
       getBnWImages(original,answers,umbral,compression).then(
         (bnwImages) => {
-
           bnwImages.map( (value,index) => {
             let canvas = document.getElementById("c"+index);
             let contexto = canvas.getContext('2d');
-
             contexto.canvas.width=value.width;
             contexto.canvas.height=value.height;
             contexto.putImageData(value,0,0);

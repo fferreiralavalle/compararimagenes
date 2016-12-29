@@ -60,7 +60,7 @@ export class Principal extends Component{
     render(){
       	return(
       		<div>
-            Hello word!
+            <h1>Hola Facu</h1>
             <Comparar width="500" original={original} answers={arrayImgs} umbral={divisorUmbral} compression={compression}/>
 
           </div>
