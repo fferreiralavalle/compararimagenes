@@ -123,7 +123,6 @@ export class Comparar extends Component{
 
     drawCanvas(){
       let {original,answers,umbral,compression} = this.props;
-      console.log(compression);
       getBnWImages(original,answers,umbral,compression).then(
         (bnwImages) => {
           bnwImages.map( (value,index) => {

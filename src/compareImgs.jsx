@@ -54,7 +54,6 @@ const setClickPosition = (event)=>{
     let rect = canvas.getBoundingClientRect();
     let x = Math.floor(event.clientX - rect.left);
     let y = Math.floor(event.clientY - rect.top);
-    console.log(x,y);
     let coordXY = {
       x: x,
       y: y
@@ -68,8 +67,6 @@ const setClickPosition = (event)=>{
     let newCoordMouse = convertCoord(coordXY,oldSize,newSize);
     mouseX =  Math.floor(newCoordMouse.x);
     mouseY =  Math.floor(newCoordMouse.y);
-    console.log(oldSize,newSize);
-    console.log(mouseX,mouseY);
 };
 
 const convertCoord = (coordXY,oldSize,newSize) =>{
