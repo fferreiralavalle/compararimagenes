@@ -49,3 +49,15 @@ const arrayCubos = [
         url: "/assets/5.jpg",
         texto: 'fondo'
     }];
+
+const originalRnC = '/assets/Ratchet_and_Clank.png'
+const arrayRnC = [
+  {url: "/assets/Ratchet_and_Clank_Gun.png",
+  texto: 'Gun!'},
+  {url: "/assets/Ratchet_and_Clank_Clank.png",
+  texto: 'Clank!'},
+  {url: "/assets/Ratchet_and_Clank_Ratchet.png",
+  texto: 'Ratchet!'},
+  {url: "/assets/Ratchet_and_Clank_dingdong.png",
+  texto: '8===D'}
+];

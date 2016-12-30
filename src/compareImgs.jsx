@@ -1,7 +1,7 @@
 import React,{ Component } from 'react';
 
 let divisorUmbral = 20;
-let divisorimg = 15;
+let wantedSize = 15;
 let imgWidth;
 let imgHeight;
 let mouseX = 0;
@@ -26,7 +26,7 @@ export const compareImgs = (evt,imgO,aswArr, umb, divisorimagen) => {
     divisorUmbral  = umb;
    }
    if (typeof divisorimagen !== undefined){
-      divisorimg = divisorimagen;
+       wantedSize = divisorimagen;
     }
     return initCompare(evt,imgO,aswArr);
 };
@@ -83,56 +83,74 @@ const convertCoord = (coordXY,oldSize,newSize) =>{
 };
 
 const loadImages = (originalImg, answersArray, imgDataArray,index)  =>{
-  return new Promise( (resolve,reject) => {
-    let img = new Image();
-    let canvas = document.createElement("canvas");
+    return new Promise( (resolve,reject) => {
+        let img = new Image();
+        let canvas = document.createElement("canvas");
+        let context = canvas.getContext('2d');
+        if (index>=answersArray.length){
+            img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                resize(80,canvas);
+                context.drawImage(img, 0, 0);
+                let imageData = context.getImageData(0,0,canvas.width,canvas.height);
+                let originalImg1 = {
+                    dataArray: imageData.data,
+                    width: imageData.width,
+                    height: imageData.height
+                };
+                imgWidth=imageData.width;
+                imgHeight=imageData.height;
+
+                resolve({
+                    originalImg1 : originalImg1,
+                    imgDataArray : imgDataArray
+                });
+            };
+            img.src = originalImg;
+        }else{
+            img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                resize(80,canvas);
+                context.drawImage(img, 0, 0);
+                let imageData = context.getImageData(0,0,canvas.width,canvas.height);
+                imgDataArray.push({
+                    dataArray: context.getImageData(0,0,canvas.width,canvas.height).data,
+                    width: imageData.width,
+                    height: imageData.height
+                });
+                loadImages(originalImg, answersArray,imgDataArray,index+1).then(
+                    (resolved) => {
+                        resolve(resolved);
+                    }
+                );
+            };
+            img.src = answersArray[index].url;
+        }
+    });
+
+};
+
+const resize = (wantedSize, canvas) => {
+    let {width,height} = canvas;
     let context = canvas.getContext('2d');
-    if (index>=answersArray.length){
-      img.onload = () => {
-        let modifiedWidth = img.width/divisorimg;
-        let modifiedHeight = img.height/divisorimg;
-        canvas.width=modifiedWidth;
-        canvas.height=modifiedHeight;
-        context.scale(1/divisorimg,1/divisorimg);
-        context.drawImage(img, 0, 0);
-        let imageData = context.getImageData(0,0,modifiedWidth,modifiedHeight);
-        let originalImg1 = {
-            dataArray: imageData.data,
-            width: imageData.width,
-            height: imageData.height
-          };
-        imgWidth=imageData.width;
-        imgHeight=imageData.height;
-
-        resolve({
-          originalImg1 : originalImg1,
-          imgDataArray : imgDataArray
-        });
-      };
-      img.src = originalImg;
-    }else{
-      img.onload = () => {
-        let modifiedWidth = img.width/divisorimg;
-        let modifiedHeight = img.height/divisorimg;
-        canvas.width=modifiedWidth;
-        canvas.height=modifiedHeight;
-        context.scale(1/divisorimg,1/divisorimg);
-        context.drawImage(img, 0, 0);
-        imgDataArray.push({
-            dataArray: context.getImageData(0,0,modifiedWidth,modifiedHeight).data,
-            width: modifiedWidth,
-            height: modifiedHeight
-          });
-        loadImages(originalImg, answersArray,imgDataArray,index+1).then(
-          (resolved) => {
-            resolve(resolved);
-          }
-        );
-      };
-      img.src = answersArray[index].url;
+    if ((width)>=(height)){
+        let divisorWidth = wantedSize/(canvas.width);
+        let widthHeightRelation = (canvas.height)/(canvas.width);
+        let divisorHeight = (wantedSize*widthHeightRelation)/(canvas.height);
+        canvas.width = wantedSize;
+        canvas.height = wantedSize*widthHeightRelation;
+        context.scale(divisorWidth,divisorHeight);
     }
-  });
-
+    else{
+        let divisorHeight = wantedSize/canvas.height;
+        let widthHeightRelation = canvas.width/canvas.height;
+        let divisorWidth = (wantedSize*widthHeightRelation)*canvas.width;
+        canvas.width = wantedSize*widthHeightRelation;;
+        canvas.height = wantedSize;
+        context.scale(divisorWidth,divisorHeight);
+    }
 };
 
 const getClosestElement = (originalImg, imgDataArray) => {
@@ -224,7 +242,7 @@ const getPixelPosition = (indice) => {
 const initCompareBnW = (originalImg, answersArray,umbral,divisor) =>{
   let imgDataArray= [];
   divisorUmbral=umbral;
-  divisorimg=divisor;
+  wantedSize=divisor;
   return new Promise( (resolve,reject) => {
     loadImages(originalImg,answersArray,imgDataArray, 0).then(
       (object) => {
