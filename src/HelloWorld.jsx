@@ -22,7 +22,7 @@ export class Principal extends Component {
     }
     ];
     static divisorUmbral = 20;
-    static compression = 10;
+    static compression = 80;
 
     render() {
         const {originalImg, imgsArray,divisorUmbral,compression} = Principal;

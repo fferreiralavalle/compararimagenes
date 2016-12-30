@@ -1,7 +1,7 @@
 import React,{ Component } from 'react';
 
 let divisorUmbral = 20;
-let wantedSize = 15;
+let wantedSize = 80;
 let imgWidth;
 let imgHeight;
 let mouseX = 0;
@@ -15,9 +15,9 @@ export const getBnWImages = (originalImg, answersArray, umbral,compression) => {
     divisorUmbral = umbral;
   }
   if (compression !== undefined){
-    divisorUmbral=compression;
+      wantedSize=compression;
   }
-  return initCompareBnW(originalImg,answersArray,umbral,compression);
+  return initCompareBnW(originalImg,answersArray);
 };
 
 export const compareImgs = (evt,imgO,aswArr, umb, divisorimagen) => {
@@ -91,7 +91,7 @@ const loadImages = (originalImg, answersArray, imgDataArray,index)  =>{
             img.onload = () => {
                 canvas.width = img.width;
                 canvas.height = img.height;
-                resize(80,canvas);
+                resize(wantedSize,canvas);
                 context.drawImage(img, 0, 0);
                 let imageData = context.getImageData(0,0,canvas.width,canvas.height);
                 let originalImg1 = {
@@ -112,11 +112,11 @@ const loadImages = (originalImg, answersArray, imgDataArray,index)  =>{
             img.onload = () => {
                 canvas.width = img.width;
                 canvas.height = img.height;
-                resize(80,canvas);
+                resize(wantedSize,canvas);
                 context.drawImage(img, 0, 0);
                 let imageData = context.getImageData(0,0,canvas.width,canvas.height);
                 imgDataArray.push({
-                    dataArray: context.getImageData(0,0,canvas.width,canvas.height).data,
+                    dataArray: imageData.data,
                     width: imageData.width,
                     height: imageData.height
                 });
@@ -239,10 +239,8 @@ const getPixelPosition = (indice) => {
 
 };
 
-const initCompareBnW = (originalImg, answersArray,umbral,divisor) =>{
+const initCompareBnW = (originalImg, answersArray) =>{
   let imgDataArray= [];
-  divisorUmbral=umbral;
-  wantedSize=divisor;
   return new Promise( (resolve,reject) => {
     loadImages(originalImg,answersArray,imgDataArray, 0).then(
       (object) => {
