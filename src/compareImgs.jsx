@@ -85,7 +85,7 @@ const convertCoord = (coordXY,oldSize,newSize) =>{
 const loadImages = (originalImg, answersArray, imgDataArray,index)  =>{
   return new Promise( (resolve,reject) => {
     let img = new Image();
-    let canvas = document.createElement("canvas")
+    let canvas = document.createElement("canvas");
     let context = canvas.getContext('2d');
     if (index>=answersArray.length){
       img.onload = () => {

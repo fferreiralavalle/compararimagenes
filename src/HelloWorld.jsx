@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Comparar} from './comparar.jsx';
 
+
 export class Principal extends Component {
     constructor(props){
         super(props);
@@ -29,24 +30,31 @@ export class Principal extends Component {
     static compression = 10;
 
     getRender(originalImg, imgsArray) {
-        let dimensions = new Image();
-        dimensions.src = originalImg;
+        let errorsize = false;
+        let image = new Image();
+        image.onload = () => {
+            const originalWidth = image.width;
+            const originalHeight = image.height;
+            console.log(originalWidth);
+            console.log(originalHeight);
+            console.log("antes original, ahora las del array");
+            imgsArray.map((img) => {
+               let imageFromArray = new Image();
+               imageFromArray.onload = () => {
+                   const arrayWidth = imageFromArray.width;
+                   const arrayHeight = imageFromArray.height;
+                   console.log(arrayWidth);
+                   console.log(arrayHeight);
+                   if(arrayWidth !== originalWidth || arrayHeight !== originalHeight){
+                       errorsize = true;
+                   }
+               };
+               imageFromArray.src = img.url;
+            })
+        };
+        image.src = originalImg;
 
-        const originalWidth = dimensions.width;
-        const originalHeight = dimensions.height;
-        console.log(originalWidth);
-        console.log(originalHeight);
-        console.log("antes original, ahora las del array");
-
-        const invalidImages = imgsArray.map((img) => {
-            let imgDimensions = new Image();
-            imgDimensions.src = img.url;
-            console.log(imgDimensions.width);
-            console.log(imgDimensions.height);
-            return imgDimensions.width !== originalWidth || imgDimensions.height !== originalHeight;
-        }).find((element) => (element));
-
-        if (invalidImages) {
+        if (errorsize) {
             return (
                 <div>
                     <h1>Images do not have the same size - Verify</h1>
