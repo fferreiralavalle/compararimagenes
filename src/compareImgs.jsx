@@ -1,5 +1,6 @@
 import React,{ Component } from 'react';
 
+//Default values
 let divisorUmbral = 20;
 let wantedSize = 80;
 let imgWidth;
@@ -7,6 +8,10 @@ let imgHeight;
 let mouseX = 0;
 let mouseY = 0;
 
+let errorStructure = {
+  id: '',
+  text: ''
+}
 
 let BnWCanvas = [];
 
@@ -37,12 +42,16 @@ const initCompare = (event, originalImg, answersArray) =>{
   return new Promise( (resolve,reject) => {
     loadImages(originalImg,answersArray, imgDataArray,0).then(
       (object) => {
+        let errors = [];
+        errors.push (...object.errors);
         setClickPosition(event);
         let closestElementIndex = getClosestElement(object.originalImg1,object.imgDataArray);
+        errors.push (...closestElementIndex.errors);
         resolve({
-          index: closestElementIndex,
+          index: closestElementIndex.index,
           width: imgWidth,
-          height: imgHeight
+          height: imgHeight,
+          errors: errors
         });
       }
     );
@@ -83,6 +92,7 @@ const convertCoord = (coordXY,oldSize,newSize) =>{
 };
 
 const loadImages = (originalImg, answersArray, imgDataArray,index)  =>{
+    let errors = [];
     return new Promise( (resolve,reject) => {
         let img = new Image();
         let canvas = document.createElement("canvas");
@@ -93,6 +103,7 @@ const loadImages = (originalImg, answersArray, imgDataArray,index)  =>{
                 canvas.height = img.height;
                 resize(wantedSize,canvas);
                 context.drawImage(img, 0, 0);
+                console.log(imageData);
                 let imageData = context.getImageData(0,0,canvas.width,canvas.height);
                 let originalImg1 = {
                     dataArray: imageData.data,
@@ -101,12 +112,25 @@ const loadImages = (originalImg, answersArray, imgDataArray,index)  =>{
                 };
                 imgWidth=imageData.width;
                 imgHeight=imageData.height;
-
+                let differentImgs = 0;
+                for (let i=0; i<imgDataArray.length; i++){
+                  if (imgWidth!=imgDataArray[i].width || imgHeight!=imgDataArray[i].height){
+                    differentImgs++;
+                  }
+                }
+                if (differentImgs>0){
+                  let error = Object.assign ({},errorStructure);
+                  error.id = 'imgSize';
+                  error.text = differentImgs+' images sizes differ from the original image';
+                  errors.push(error);
+                }
                 resolve({
                     originalImg1 : originalImg1,
-                    imgDataArray : imgDataArray
+                    imgDataArray : imgDataArray,
+                    errors: errors
                 });
             };
+            img.crossOrigin = 'Anonymous';
             img.src = originalImg;
         }else{
             img.onload = () => {
@@ -126,6 +150,7 @@ const loadImages = (originalImg, answersArray, imgDataArray,index)  =>{
                     }
                 );
             };
+            img.crossOrigin = 'Anonymous';
             img.src = answersArray[index].url;
         }
     });
@@ -158,13 +183,21 @@ const getClosestElement = (originalImg, imgDataArray) => {
   let closestImgIndex;
   let minDists = [];
   let dataArrayOriginal = originalImg.dataArray;
-
+  let errors =[];
+  let errorAt = {
+    getDiffDotsAndMax: false,
+    getMinDistance: false
+  }
   //set array of distances
   for (let i=0; i<imgDataArray.length;i++){
     let dataArrayAnswers = imgDataArray[i].dataArray;
     let {datadiff, max} = getDiffDotsAndMax(dataArrayOriginal,dataArrayAnswers);
     let resultado = getMinDistance(datadiff, max);
-    let {minDist} = resultado;
+    let minDist = resultado.value;
+    if (resultado.errors.length>0){
+
+      errors.push(...resultado.errors);
+    }
     minDists.push(minDist);
   }
 
@@ -180,9 +213,15 @@ const getClosestElement = (originalImg, imgDataArray) => {
 
   //validate
   if (closestDistance<0) {
-    return null;
+    let error = Object.assign ({},errorStructure);
+    error.id = "minDistances";
+    error.text='Error getting min distances';
+    errors.push(error);
   }
-  return closestImgIndex;
+  return {
+    index: closestImgIndex,
+    errors: errors
+  }
 };
 
 const getDiffDotsAndMax = (imgDataOriginal, imgDataMod) => {
@@ -206,7 +245,7 @@ const getDiffDotsAndMax = (imgDataOriginal, imgDataMod) => {
 
 const getMinDistance = (imgDataDiff,max) =>{
   let minDist = -1;//error checker
-
+  let errors = [];
   for (let i = 0; i < imgDataDiff.length; i ++ ) {
     if (max/divisorUmbral < imgDataDiff[i]){
       let dist = getDistance(getPixelPosition(i));
@@ -219,9 +258,14 @@ const getMinDistance = (imgDataDiff,max) =>{
   }
   if (minDist==-1) {
     console.log("Error getting min distance of image");
+    let error = Object.assign ({},errorStructure);
+    error.id = "minDistance";
+    error.text = 'Error al recorrer dataimg, puede ser undefined o tener length 0'
+    errors.push(error);
   }
   return {
-      minDist: minDist,
+      value: minDist,
+      errors: errors
     };
 };
 

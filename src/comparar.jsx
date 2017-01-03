@@ -12,21 +12,20 @@ export class Comparar extends Component{
           this.loadImage = this.loadImage.bind(this);
           this.updateCanvas = this.updateCanvas.bind(this);
           this.drawCanvas = this.drawCanvas.bind(this);
-          this.checkImgsSize = this.checkImgsSize.bind(this);
+          this.checkForSizeError = this.checkForSizeError.bind(this);
         }
 
     componentDidMount(){
         let {loadImage} = this;
         let {original,answers} = this.props;
-        this.checkImgsSize(original,answers);
         let canvas = document.getElementById("canvasPrincipal");
         loadImage (original, canvas);
     }
 
     componentDidUpdate(){
-        if(!this.state.sizeError){
-            this.updateCanvas();
-        }
+
+      this.updateCanvas();
+
     }
 
     updateCanvas = () => {
@@ -63,45 +62,30 @@ export class Comparar extends Component{
    };
 
     actualizarEstado(event){
+      let {checkForSizeError} = this;
       let {original,answers,umbral,compression} = this.props;
       compareImgs(event,original,answers, umbral,compression).then(
         (resolve) =>
         {
-          let {index} = resolve;
+          console.log(resolve.errors);
+          let {index,errors} = resolve;
+          let sizeError = checkForSizeError(errors);
           this.setState({
-            chosenAnswerIndex : index
+            chosenAnswerIndex : index,
+            sizeError: sizeError
           });
         }
       );
     }
 
-    checkImgsSize (original,answers){
-        let image = new Image();
-        image.onload = () => {
-            const originalWidth = image.width;
-            const originalHeight = image.height;
-            console.log(originalWidth);
-            console.log(originalHeight);
-            console.log("antes original, ahora las del array");
-            answers.map((img) => {
-                let imageFromArray = new Image();
-                imageFromArray.onload = () => {
-                    const arrayWidth = imageFromArray.width;
-                    const arrayHeight = imageFromArray.height;
-                    console.log(arrayWidth);
-                    console.log(arrayHeight);
-                    if(arrayWidth !== originalWidth || arrayHeight !== originalHeight){
-                        this.setState({
-                            sizeError : true
-                        });
-                    }
-                };
-                imageFromArray.src = img.url;
-            });
-        };
-        image.src = original;
+    checkForSizeError = (errors)=> {
+      for (let i=0 ; i<errors.length ; i++){
+        if (errors[i].id == "imgSize"){
+          return true;
+        }
+      }
+      return false;
     }
-
     render(){
         let {actualizarEstado,drawCanvas} = this;
         let {chosenAnswerIndex, sizeError} = this.state;
@@ -116,28 +100,28 @@ export class Comparar extends Component{
         if (sizeError){
             return (
                 <div>
-                    <h1>Images do not have the same size - Verify</h1>
+                  <h1>Images sizes differ from the original - Please verify</h1>
                 </div>
             );
         } else {
             return (
                 <div>
-                    <canvas
-                        id="canvasPrincipal"
-                        onMouseDown={
-                            (event) => {
-                                actualizarEstado(event)
-                            }
-                        }
-                    />
-                    <button onClick={() => {
-                        drawCanvas()
-                    }}>Get Img BnW
-                    </button>
-                    {
-                        this.drawEmptyCanvas()
+                  <canvas
+                    id="canvasPrincipal"
+                    onMouseDown={
+                      (event) => {
+                        actualizarEstado(event)
+                      }
                     }
-                    <h1> {h1} </h1>
+                  />
+                  <button onClick={() => {
+                    drawCanvas()
+                  }}>Get Img BnW
+                  </button>
+                  {
+                    this.drawEmptyCanvas()
+                  }
+                  <h1> {h1} </h1>
                 </div>
             );
         }
