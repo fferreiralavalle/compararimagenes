@@ -7,6 +7,7 @@ export class Principal extends Component {
         super(props);
     }
     static originalImg = 'http://static.iamat.com/media/58359cf3790a71079a009bdc.small.jpeg';
+
     static imgsArray = [
         {
             url: "/assets/messi_bocha.small.jpeg",

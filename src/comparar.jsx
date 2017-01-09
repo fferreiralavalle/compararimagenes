@@ -61,6 +61,7 @@ export class Comparar extends Component{
        img.src = url;
    };
 
+
     actualizarEstado(event){
       let {checkForSizeError} = this;
       let {original,answers,umbral,compression} = this.props;
@@ -100,7 +101,7 @@ export class Comparar extends Component{
         if (sizeError){
             return (
                 <div>
-                  <h1>Images sizes differ from the original - Please verify</h1>
+                  <h1>Images size differ from the original - Please verify</h1>
                 </div>
             );
         } else {

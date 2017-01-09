@@ -121,7 +121,7 @@ const loadImages = (originalImg, answersArray, imgDataArray,index)  =>{
                 if (differentImgs>0){
                   let error = Object.assign ({},errorStructure);
                   error.id = 'imgSize';
-                  error.text = differentImgs+' images sizes differ from the original image';
+                  error.text = differentImgs+' images size differ from the original image';
                   errors.push(error);
                 }
                 resolve({
