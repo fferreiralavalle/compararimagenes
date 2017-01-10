@@ -1,5 +1,6 @@
 import React,{ Component } from 'react';
 import {compareImgs,getBnWImages} from './compareImgs.jsx';
+import {getHistoriesOfType,getLoadableContent} from "./IamatHistory.jsx";
 
 export class Comparar extends Component{
   constructor(props){
@@ -18,8 +19,9 @@ export class Comparar extends Component{
     componentDidMount(){
         let {loadImage} = this;
         let {original,answers} = this.props;
+        let {url} = original;
         let canvas = document.getElementById("canvasPrincipal");
-        loadImage (original, canvas);
+        loadImage (url, canvas);
     }
 
     componentDidUpdate(){
@@ -65,7 +67,8 @@ export class Comparar extends Component{
     actualizarEstado(event){
       let {checkForSizeError} = this;
       let {original,answers,umbral,compression} = this.props;
-      compareImgs(event,original,answers, umbral,compression).then(
+      let originalUrl = original.url;
+      compareImgs(event,originalUrl,answers, umbral,compression).then(
         (resolve) =>
         {
           console.log(resolve.errors);
@@ -75,6 +78,9 @@ export class Comparar extends Component{
             chosenAnswerIndex : index,
             sizeError: sizeError
           });
+          getHistoriesOfType("poll_answered_response2").then((data) =>{
+            console.log(data);
+          })
         }
       );
     }
@@ -90,10 +96,10 @@ export class Comparar extends Component{
     render(){
         let {actualizarEstado,drawCanvas} = this;
         let {chosenAnswerIndex, sizeError} = this.state;
-        let {answers} = this.props;
+        let {answers,original} = this.props;
         let h1;
         if (chosenAnswerIndex==-1){
-          h1 = 'Elija una opcion';
+          h1 = original.texto;
         }
         else{
           h1 = 'usted ha elegido: '+ answers[chosenAnswerIndex].texto
@@ -150,7 +156,8 @@ export class Comparar extends Component{
 
     drawCanvas(){
       let {original,answers,umbral,compression} = this.props;
-      getBnWImages(original,answers,umbral,compression).then(
+      let originalUrl = original.url;
+      getBnWImages(originalUrl,answers,umbral,compression).then(
         (bnwImages) => {
           bnwImages.map( (value,index) => {
             let canvas = document.getElementById("c"+index);

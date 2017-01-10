@@ -260,7 +260,7 @@ const getMinDistance = (imgDataDiff,max) =>{
     console.log("Error getting min distance of image");
     let error = Object.assign ({},errorStructure);
     error.id = "minDistance";
-    error.text = 'Error al recorrer dataimg, puede ser undefined o tener length 0'
+    error.text = 'Error al recorrer dataimg, puede ser undefined, tener length 0 o todas las imagenes son iguales'
     errors.push(error);
   }
   return {
