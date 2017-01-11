@@ -130,7 +130,7 @@ const loadImages = (originalImg, answersArray, imgDataArray,index)  =>{
                     errors: errors
                 });
             };
-            img.crossOrigin = 'Anonymous';
+            // img.crossOrigin = 'Anonymous';
             img.src = originalImg;
         }else{
             img.onload = () => {
@@ -150,7 +150,7 @@ const loadImages = (originalImg, answersArray, imgDataArray,index)  =>{
                     }
                 );
             };
-            img.crossOrigin = 'Anonymous';
+            // img.crossOrigin = 'Anonymous';
             img.src = answersArray[index].url;
         }
     });
