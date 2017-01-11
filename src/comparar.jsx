@@ -60,7 +60,7 @@ export class Comparar extends Component{
          );
          context.drawImage(img, 0, 0);
        };
-      //  img.crossOrigin = 'Anonymous';
+       img.crossOrigin = 'Anonymous';
        img.src = url;
      }
 

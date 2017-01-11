@@ -48,10 +48,10 @@ export class Principal extends Component {
           })
         })
 
-
+        let random = Math.floor (Math.random()* questionsAndAnswers.length);
         this.setState({
-          originalImg: questionsAndAnswers[0].question,
-          imgsArray: questionsAndAnswers[0].answers
+          originalImg: questionsAndAnswers[random].question,
+          imgsArray: questionsAndAnswers[random].answers
         });
         console.log(state);
 
