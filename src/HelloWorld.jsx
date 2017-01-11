@@ -2,53 +2,59 @@ import React, {Component} from 'react';
 import {Comparar} from './comparar.jsx';
 import {getHistoriesOfType,getLoadableContent,filterDataWithType} from "./IamatHistory.jsx";
 
-
+//https://api.iamat.com/atcode/iamat-muestra/history/till/now?type=sh_img,sh_poll2,poll_answered_response2,poll_final_response2
 
 export class Principal extends Component {
     constructor(props){
         super(props);
         this.state = {
-          originalImg: {
+          "originalImg": {
             url: '',
             texto: ""
           },
-          imgsArray: {
+          "imgsArray": {
             url: '',
             texto: ""
           }
         };
         this.loadData = this.loadData.bind(this);
-
     }
-    //https://api.iamat.com/atcode/iamat-muestra/history/till/now?type=sh_img,sh_poll2,poll_answered_response2,poll_final_response2
-    static originalImg = {
-      url:'http://static.iamat.com/media/583ddd7315e0813bd1eb67d0.small.png',
-      texto: "Apretame?"
-    };
 
-    static imgsArray = [
-        {
-            url: "http://static.iamat.com/media/583ddd8315e0813bd1eb67d3.small.png",
-            texto: 'bocha'
-        },{
-          url: "http://static.iamat.com/media/583ddda215e0813bd1eb67d7.small.png",
-          texto: 'bocha'
-        }
-    ];
-    static divisorUmbral = 20;
+
+    static divisorUmbral = 20; //los dejo de tomar nose por que
     static compression = 80;
+
     componentDidMount (){
       let {loadData} = this;
       loadData();
+      console.log(this);
     }
+
     loadData() {
       let histories = [];
+      let questionsAndAnswers = [];
+      let {state,setState} = this;
       getHistoriesOfType("poll_answered_response2").then((data)=>{
         histories = data.history;
         console.log(data);
         let historiesFiltered = [];
         historiesFiltered = filterDataWithType("imagePattern",histories);
         console.log(historiesFiltered);
+        historiesFiltered.map ( (history,index) =>{
+          let {question,answers} = getLoadableContent(history,1);
+          questionsAndAnswers.push({
+            question: question,
+            answers: answers
+          })
+        })
+
+
+        this.setState({
+          originalImg: questionsAndAnswers[0].question,
+          imgsArray: questionsAndAnswers[0].answers
+        });
+        console.log(state);
+
       });
     }
 
@@ -56,9 +62,11 @@ export class Principal extends Component {
         let {divisorUmbral,compression,state} = this;
         let {originalImg,imgsArray} = state;
         let component = <div/>
+        console.log("compression = "+compression);
+        console.log("divisorUmbral = "+divisorUmbral);
         if (originalImg.url!=""){
-          component = (<Comparar width="500" original={originalImg} answers={imgsArray} umbral={divisorUmbral}
-            compression={compression}/>)
+          component = (<Comparar width="500" original={originalImg} answers={imgsArray} umbral={20}
+            compression={80}/>)
           }
         return (
             <div>

@@ -22,11 +22,13 @@ export const getHistoriesOfType = (type)=>{
 }
 
 export const filterDataWithType = (dataType,histories)=>{
-  return histories.map((history) =>{
+  let filteredData = [];
+  histories.map((history) =>{
     if (history.data.type==dataType){
-      return history;
+      filteredData.push(history);
     }
   });
+  return filteredData;
 }
 
 export const getLoadableContent = (history,formatImgNumber)=>{
@@ -40,13 +42,14 @@ export const getLoadableContent = (history,formatImgNumber)=>{
   loadableAnswers = answers.map( (answer) =>
   {
       let loadableAnswer = Object.assign ({},answersStructure);
-      let {image} = answer;
-      return parseImageUrl(image,formatImgNumber);
+      let {image,text} = answer;
+      loadableAnswer.url = parseImageUrl(image,formatImgNumber);
+      loadableAnswer.text = text;
+      return loadableAnswer;
   });
-
   let originalImg = Object.assign ({},answersStructure);
   originalImg.url = parseImageUrl(image,formatImgNumber);
-  original.text = question;
+  originalImg.text = question;
   return {
     question: originalImg,
     answers: loadableAnswers
@@ -54,7 +57,7 @@ export const getLoadableContent = (history,formatImgNumber)=>{
 }
 
 const parseImageUrl = (image, formatNumber)=>{
-  let {ext,filename,basepath,formats} = image;
+  let {ext,filename,basePath,formats} = image;
   let url;
   if (formatNumber>=formats.lenth)
     formatNumber = formats.lenth - 1;
@@ -62,7 +65,8 @@ const parseImageUrl = (image, formatNumber)=>{
     if (formatNumber<0)
       formatNumber = 0;
 
-  url = basepath+filename+formats[formatNumber]+ext;
+  url = basePath+filename+"."+formats[formatNumber]+"."+ext;
+  console.log("url final: "+url);
   return url;
 
 
