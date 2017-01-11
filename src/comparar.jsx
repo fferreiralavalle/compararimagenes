@@ -22,7 +22,6 @@ export class Comparar extends Component{
         let {url} = original;
         let canvas = document.getElementById("canvasPrincipal");
         loadImage (url, canvas);
-        console.log(original,answers);
     }
 
     componentDidUpdate(){
@@ -98,12 +97,13 @@ export class Comparar extends Component{
         let {actualizarEstado,drawCanvas} = this;
         let {chosenAnswerIndex, sizeError} = this.state;
         let {answers,original} = this.props;
+        console.log(answers,original);
         let h1;
         if (chosenAnswerIndex==-1){
-          h1 = original.texto;
+          h1 = original.text;
         }
         else{
-          h1 = 'usted ha elegido: '+ answers[chosenAnswerIndex].texto
+          h1 = 'usted ha elegido: '+ answers[chosenAnswerIndex].text
         }
         if (sizeError){
             return (
@@ -162,10 +162,10 @@ export class Comparar extends Component{
         (bnwImages) => {
           bnwImages.map( (value,index) => {
             let canvas = document.getElementById("c"+index);
-            let contexto = canvas.getContext('2d');
-            contexto.canvas.width=value.width;
-            contexto.canvas.height=value.height;
-            contexto.putImageData(value,0,0);
+            let context = canvas.getContext('2d');
+            context.canvas.width=value.width;
+            context.canvas.height=value.height;
+            context.putImageData(value,0,0);
           });
         }
       );

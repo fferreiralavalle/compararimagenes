@@ -66,7 +66,6 @@ const parseImageUrl = (image, formatNumber)=>{
       formatNumber = 0;
 
   url = basePath+filename+"."+formats[formatNumber]+"."+ext;
-  console.log("url final: "+url);
   return url;
 
 
