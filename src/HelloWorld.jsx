@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Comparar} from './comparar.jsx';
-import {getHistoriesOfType,getLoadableContent,filterDataWithType} from "./IamatHistory.jsx";
+import {ImageTextList} from "./imageTextList.jsx"
+import {searchById,getHistoriesOfType,getLoadableContent,filterDataWithType} from "./IamatHistory.jsx";
 
 //https://api.iamat.com/atcode/iamat-muestra/history/till/now?type=sh_img,sh_poll2,poll_answered_response2,poll_final_response2
 
@@ -8,14 +9,8 @@ export class Principal extends Component {
     constructor(props){
         super(props);
         this.state = {
-          "originalImg": {
-            url: '',
-            texto: ""
-          },
-          "imgsArray": {
-            url: '',
-            texto: ""
-          }
+          "pollList": [],
+          "index": 0
         };
         this.loadData = this.loadData.bind(this);
     }
@@ -36,6 +31,7 @@ export class Principal extends Component {
       let {state,setState} = this;
       getHistoriesOfType("sh_poll2").then((data)=>{
         histories = data.history;
+        console.log('la data que quiero y no toda la otra mierda');
         console.log(data);
         let historiesFiltered = [];
         historiesFiltered = filterDataWithType("ImagePattern",histories);
@@ -52,29 +48,33 @@ export class Principal extends Component {
 
         let random = Math.floor (Math.random()* questionsAndAnswers.length);
         this.setState({
-          originalImg: questionsAndAnswers[random].question,
-          imgsArray: questionsAndAnswers[random].answers
+          pollList: questionsAndAnswers
         });
-        console.log(state);
 
       });
     }
 
     render() {
-        let {divisorUmbral,compression,state} = this;
-        let {originalImg,imgsArray} = state;
-        let component = <div/>
-        console.log("compression = "+compression);
-        console.log("divisorUmbral = "+divisorUmbral);
-        if (originalImg.url!=""){
-          component = (<Comparar width="500" original={originalImg} answers={imgsArray} umbral={20}
-            compression={80}/>)
+        let {state,searchById} = this;
+        let {pollList,index} = state;
+        
+        let component = <div/>, pollListComponent = <div/>
+        if (pollList.length!=0){
+          let {question,answers} = pollList[index];
+          component = (<Comparar width="500" original={question} answers={answers} umbral={20}
+            compression={80}/>);
+
+          let questions = pollList.map( (quesAndAns,index) =>{
+            return quesAndAns.question;
+          })
+          pollListComponent = <ImageTextList list={questions}/>
           }
         return (
             <div>
               <h1>La mejor página hecha por los pasantes en la historia</h1>
+              
               {component}
-
+              {pollListComponent}
             </div>
         );
     }

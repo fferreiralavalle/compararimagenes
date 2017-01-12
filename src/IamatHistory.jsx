@@ -70,3 +70,12 @@ const parseImageUrl = (image, formatNumber)=>{
 
 
 }
+//returns a list of one object
+export const searchById = (histories,id)=>{
+  return histories.map((history) =>
+  {
+    if (history.data.id==id){
+      return history;
+    }
+  });
+}

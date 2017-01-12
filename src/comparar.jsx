@@ -123,6 +123,7 @@ export class Comparar extends Component{
                       }
                     }
                   />
+                  <br/>
                   <button onClick={() => {
                     drawCanvas()
                   }}>Get Img BnW
@@ -143,7 +144,6 @@ export class Comparar extends Component{
           answers.map((component,index)=>{
           return (
             <div key={index}>
-              <br/>
               <canvas width="0" height="0" key={index} id={'c'+index}/>
             </div>
 
