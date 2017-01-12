@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-let url = "https://api.iamat.com/atcode/iamat-muestra/history";
+let url = "https://api.iamat.com/atcode/test/history";
 
 export const getHistoriesOfType = (type)=>{
   let urlExtra = "/till/now?type="+type;

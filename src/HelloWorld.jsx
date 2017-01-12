@@ -34,11 +34,12 @@ export class Principal extends Component {
       let histories = [];
       let questionsAndAnswers = [];
       let {state,setState} = this;
-      getHistoriesOfType("poll_answered_response2").then((data)=>{
+      getHistoriesOfType("sh_poll2").then((data)=>{
         histories = data.history;
         console.log(data);
         let historiesFiltered = [];
-        historiesFiltered = filterDataWithType("imagePattern",histories);
+        historiesFiltered = filterDataWithType("ImagePattern",histories);
+        console.log("histories:");
         console.log(historiesFiltered);
         historiesFiltered.map ( (history,index) =>{
           let {question,answers} = getLoadableContent(history,1);
@@ -46,6 +47,7 @@ export class Principal extends Component {
             question: question,
             answers: answers
           })
+          console.log("answers pushed");
         })
 
         let random = Math.floor (Math.random()* questionsAndAnswers.length);
