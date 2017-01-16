@@ -157,7 +157,7 @@ const loadImages = (originalImg, answersArray, imgDataArray,index)  =>{
 
 };
 
-const resize = (wantedSize, canvas) => {
+export const resize = (wantedSize, canvas) => {
     let {width,height} = canvas;
     let context = canvas.getContext('2d');
     if ((width)>=(height)){

@@ -13,6 +13,7 @@ export class Principal extends Component {
           "index": 0
         };
         this.loadData = this.loadData.bind(this);
+        this.handleIndex = this.handleIndex.bind(this);
     }
 
 
@@ -53,10 +54,17 @@ export class Principal extends Component {
 
       });
     }
-
+    handleIndex(event){
+      let {target} = event;
+      this.setState({
+        index: parseInt(target.name, 10)
+      });
+      console.log(this.state.index);
+    }
     render() {
-        let {state,searchById} = this;
+        let {state,searchById,handleIndex} = this;
         let {pollList,index} = state;
+        console.log(state);
         
         let component = <div/>, pollListComponent = <div/>
         if (pollList.length!=0){
@@ -64,10 +72,10 @@ export class Principal extends Component {
           component = (<Comparar width="500" original={question} answers={answers} umbral={20}
             compression={80}/>);
 
-          let questions = pollList.map( (quesAndAns,index) =>{
+          let questions = pollList.map( (quesAndAns) =>{
             return quesAndAns.question;
           })
-          pollListComponent = <ImageTextList list={questions}/>
+          pollListComponent = <ImageTextList list={questions} handleIndex={handleIndex}/>
           }
         return (
             <div>

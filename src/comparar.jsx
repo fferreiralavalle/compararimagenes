@@ -34,9 +34,12 @@ export class Comparar extends Component{
       let {loadImage} = this;
       let {chosenAnswerIndex} = this.state;
       let {answers} = this.props;
-      let {url} = answers[chosenAnswerIndex];
-      let canvasPrincipal = document.getElementById("canvasPrincipal");
-      loadImage(url,canvasPrincipal);
+      if (chosenAnswerIndex!=-1){
+        let {url} = answers[chosenAnswerIndex];
+        let canvasPrincipal = document.getElementById("canvasPrincipal");
+        loadImage(url,canvasPrincipal);
+      }
+      
 
     };
 
@@ -64,6 +67,7 @@ export class Comparar extends Component{
        img.src = url;
      }
 
+    
     actualizarEstado(event){
       let {checkForSizeError} = this;
       let {original,answers,umbral,compression} = this.props;

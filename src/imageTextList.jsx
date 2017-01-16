@@ -6,12 +6,15 @@ export class ImageTextList extends Component {
     }
 
     render(){
-        let {list} = this.props;
+        let {list,handleIndex} = this.props;
+        console.log(handleIndex);
         let listComponent = list.map ( (element,index) =>{
             return (
                 <li key={index}>
-                    <img src={element.url}/>
-                    <p>{element.text}</p>
+                <button onClick={handleIndex} name={index}>
+                    <img src={element.url} width="120px"/>
+                    {element.text}
+                </button>
                 </li>  
             );
         });
