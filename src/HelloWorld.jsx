@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Comparar} from './comparar.jsx';
+import {ComparableCanvas} from './comparableCanvas';
 import {ImageTextList} from "./imageTextList.jsx"
 import {searchById,getHistoriesOfType,getLoadableContent,filterDataWithType} from "./IamatHistory.jsx";
 

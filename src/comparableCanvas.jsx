@@ -2,7 +2,7 @@ import React,{ Component } from 'react';
 import {compareImgs,getBnWImages} from './compareImgs.jsx';
 import {getHistoriesOfType,getLoadableContent} from "./IamatHistory.jsx";
 
-export class Comparar extends Component{
+export class ComparableCanvas extends Component{
   constructor(props){
           super(props);
           this.state = {
